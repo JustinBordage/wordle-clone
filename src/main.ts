@@ -3,7 +3,7 @@ import PrimeVue from "primevue/config";
 import { createPinia } from "pinia";
 import App from "@/App.vue";
 import "@/styles/prime-vue/theme.scss";
-import "@/style.css";
+import "@/styles/common.scss";
 
 createApp(App)
 	.use(createPinia())
