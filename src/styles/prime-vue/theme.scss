@@ -1,0 +1,7 @@
+@use "sass:meta";
+
+@layer base, primevue, custom_primevue;
+
+@layer primevue {
+    @include meta.load-css("primevue/resources/themes/md-dark-indigo/theme.css");
+}
