@@ -1,32 +1,86 @@
 <script setup lang="ts">
-	import HelloWorld from "@/components/HelloWorld.vue";
+	import { computed, onBeforeMount, onUnmounted, ref } from "vue";
+	import GameHeader from "@/components/GameHeader.vue";
+	import GameBoard from "@/components/GameBoard.vue";
+	import { validateWordle } from "@/composables/useWordleCheck.ts";
+	import GameTileState from "@/models/enums/GameTileState.ts";
+
+	const solution = "block";
+	const maxGuesses = 6;
+
+	const results = ref<GameTileState[][]>(Array(maxGuesses));
+	const guesses = ref<string[]>(Array(maxGuesses).fill(""));
+	const activeRow = ref(0);
+
+	// This will be used to disable the inputs
+	// while the "flip" animation is running.
+	const disabled = ref(false);
+
+	const guess = computed({
+		get: () => guesses.value[activeRow.value],
+		set(newGuess: string) {
+			if (newGuess.length <= solution.length) {
+				guesses.value[activeRow.value] = newGuess;
+			}
+		},
+	});
+
+	const validKeys = /[A-Za-z]/;
+
+	function onBeforeInput(event: KeyboardEvent) {
+		const { key, altKey, ctrlKey } = event;
+		if (altKey || ctrlKey) return;
+
+		switch (key) {
+			case "Backspace":
+				guess.value = guess.value.slice(0, -1);
+				return;
+			case "Enter":
+				if (solution.length !== guess.value.length) return;
+
+				// TODO: Perform other validation like
+				//  - Is it a valid word
+				const currRow = activeRow.value;
+				const currWord = guess.value;
+				if (currRow < maxGuesses) {
+					disabled.value = true;
+					results.value[currRow] = validateWordle(solution, currWord);
+					activeRow.value++;
+				}
+				return;
+			default:
+				if (key.length === 1 && validKeys.test(key)) {
+					guess.value = guess.value + key.toUpperCase();
+				}
+				return;
+		}
+	}
+
+	onBeforeMount(() => {
+		document.addEventListener("keydown", onBeforeInput);
+	});
+
+	onUnmounted(() => {
+		document.removeEventListener("keydown", onBeforeInput);
+	});
 </script>
 
 <template>
-	<div>
-		<a href="https://vitejs.dev" target="_blank">
-			<img src="/vite.svg" class="logo" alt="Vite logo" />
-		</a>
-		<a href="https://vuejs.org/" target="_blank">
-			<img src="@/assets/vue.svg" class="logo vue" alt="Vue logo" />
-		</a>
+	<div class="app nightmode">
+		<GameHeader />
+		<GameBoard
+			:solution="solution"
+			:maxGuesses="maxGuesses"
+			:activeRow="activeRow"
+			:guesses="guesses"
+		/>
 	</div>
-	<HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-	.logo {
-		height: 6em;
-		padding: 1.5em;
-		will-change: filter;
-		transition: filter 300ms;
-	}
-
-	.logo:hover {
-		filter: drop-shadow(0 0 2em #646cffaa);
-	}
-
-	.logo.vue:hover {
-		filter: drop-shadow(0 0 2em #42b883aa);
+<style lang="scss">
+	.app {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 </style>
