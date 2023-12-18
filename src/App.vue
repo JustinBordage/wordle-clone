@@ -1,4 +1,5 @@
 <script setup lang="ts">
+	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
 	import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 	import GameHeader from "@/components/GameHeader.vue";
 	import GameBoard from "@/components/GameBoard.vue";
@@ -13,7 +14,7 @@
 	const guesses = ref<string[]>(Array(maxGuesses).fill(""));
 	const activeRow = ref(0);
 
-	const showStatistics = ref(true);
+	const showStatistics = ref(false);
 	// This will be used to disable the inputs
 	// while the "flip" animation is running.
 	const disabled = ref(false);
@@ -94,6 +95,7 @@
 			:solution="solution"
 			:isGameLost="isGameLost"
 		/>
+		<GameKeyboard />
 	</div>
 </template>
 
