@@ -1,4 +1,4 @@
-#app {
+:root {
 	// General Colors:
 	--green: #6AAA64;
 	--darkendGreen: #538D4E;
@@ -13,7 +13,7 @@
 	--blue: #85C0F9;
 }
 
-.nightmode {
+:root:has(.nightmode) {
 	--color-tone-1: #D7DADC;
 	--color-tone-2: #818384;
 	--color-tone-3: #565758;
