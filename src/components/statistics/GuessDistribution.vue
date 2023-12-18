@@ -1,4 +1,4 @@
-<script lang="ts" setup="">
+<script setup lang="ts">
 	import { Bar as BarChart } from "vue-chartjs";
 	import {
 		Chart as ChartJS,
