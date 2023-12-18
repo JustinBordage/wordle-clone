@@ -19,9 +19,10 @@
 	// while the "flip" animation is running.
 	const disabled = ref(false);
 
-	const isGameWon = computed(() =>
-		guesses.value.slice(0, activeRow.value).includes(solution),
+	const revealedGuesses = computed(() =>
+		guesses.value.slice(0, activeRow.value),
 	);
+	const isGameWon = computed(() => revealedGuesses.value.includes(solution));
 	const isGameLost = computed(
 		() => activeRow.value >= maxGuesses && !isGameWon.value,
 	);
@@ -95,7 +96,7 @@
 			:solution="solution"
 			:isGameLost="isGameLost"
 		/>
-		<GameKeyboard />
+		<GameKeyboard :results="results" :revealedGuesses="revealedGuesses" />
 	</div>
 </template>
 

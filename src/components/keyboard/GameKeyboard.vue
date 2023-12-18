@@ -1,14 +1,58 @@
 <script setup lang="ts">
+	import { computed } from "vue";
 	import { Icon } from "@iconify/vue";
 	import KeyboardKey from "@/components/keyboard/KeyboardKey.vue";
+	import GameTileState from "@/models/enums/GameTileState.ts";
 
 	defineOptions({ name: "GameKeyboard" });
+
+	const props = defineProps<{
+		results: GameTileState[][];
+		revealedGuesses: string[];
+	}>();
 
 	const keyboardKeys = [
 		["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
 		["A", "S", "D", "F", "G", "H", "J", "K", "L"],
 		["Enter", "Z", "X", "C", "V", "B", "N", "M", "Backspace"],
-	];
+	] as const;
+
+	const letterStates = computed(() => {
+		return props.results.reduce<Record<string, GameTileState>>(
+			(acc, resultRow, index) => {
+				const guessWord = props.revealedGuesses[index] ?? "";
+
+				resultRow.forEach((newLetterState, index) => {
+					const letter = guessWord.charAt(index);
+					if (letter === "") return;
+
+					const currLetterState = acc[letter];
+					if (
+						getStatePriority(newLetterState) >
+						getStatePriority(currLetterState)
+					) {
+						acc[letter] = newLetterState;
+					}
+				});
+
+				return acc;
+			},
+			{},
+		);
+	});
+
+	function getStatePriority(state: GameTileState) {
+		switch (state) {
+			case GameTileState.ABSENT:
+				return 1;
+			case GameTileState.PRESENT:
+				return 2;
+			case GameTileState.CORRECT:
+				return 3;
+			default:
+				return 0;
+		}
+	}
 </script>
 
 <template>
@@ -21,6 +65,7 @@
 			<KeyboardKey
 				v-for="(key, colIndex) in keySet"
 				:key="`${rowIndex}-${colIndex}-${key}`"
+				:state="letterStates[key]"
 				:value="key"
 			>
 				<Icon
