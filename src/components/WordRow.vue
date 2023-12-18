@@ -1,4 +1,5 @@
 <script setup lang="ts">
+	import { useIdSetGenerator } from "@/composables/useIdSetGenerator.ts";
 	import { computed, onUnmounted, ref } from "vue";
 	import GameTile from "@/components/GameTile.vue";
 	import useKeyHold from "@/composables/useKeyHold.ts";
@@ -12,12 +13,13 @@
 		solution: string;
 		guess: string;
 		isRevealed: boolean;
-		rowIndex: number;
 		isActiveRow: boolean;
 	}>();
 
+	// ----- Data -----
 	const row = ref<HTMLDivElement | null>(null);
 
+	// ----- Computed -----
 	const isIncomplete = computed(
 		() => props.solution.length !== props.guess.length,
 	);
@@ -42,21 +44,25 @@
 		}
 	});
 
+	// ----- Composables -----
+	const tileIds = useIdSetGenerator(() => props.solution.length);
+
 	const { isHeld, stop } = useKeyHold("Enter");
 	useShakeElement(
 		row,
 		() => props.isActiveRow && isHeld.value && isIncomplete.value,
 	);
 
+	// ----- Lifecycle Methods -----
 	onUnmounted(stop);
 </script>
 
 <template>
 	<div class="word-row" ref="row">
 		<GameTile
-			v-for="(letter, index) in paddedGuess"
-			:key="`${rowIndex}--${index}`"
-			:letter="letter"
+			v-for="(id, index) in tileIds"
+			:key="id"
+			:letter="paddedGuess[index]"
 			:state="tileState[index]!!"
 		/>
 	</div>
