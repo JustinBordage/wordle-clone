@@ -1,7 +1,8 @@
 <script setup lang="ts">
-	import { computed, onBeforeMount, onUnmounted, ref } from "vue";
+	import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 	import GameHeader from "@/components/GameHeader.vue";
 	import GameBoard from "@/components/GameBoard.vue";
+	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
 	import { validateWordle } from "@/composables/useWordleCheck.ts";
 	import GameTileState from "@/models/enums/GameTileState.ts";
 
@@ -12,9 +13,18 @@
 	const guesses = ref<string[]>(Array(maxGuesses).fill(""));
 	const activeRow = ref(0);
 
+	const showStatistics = ref(true);
 	// This will be used to disable the inputs
 	// while the "flip" animation is running.
 	const disabled = ref(false);
+
+	const isGameWon = computed(() =>
+		guesses.value.slice(0, activeRow.value).includes(solution),
+	);
+	const isGameLost = computed(
+		() => activeRow.value >= maxGuesses && !isGameWon.value,
+	);
+	const isGameOver = computed(() => isGameLost.value || isGameWon.value);
 
 	const guess = computed({
 		get: () => guesses.value[activeRow.value],
@@ -56,6 +66,10 @@
 		}
 	}
 
+	watch(isGameOver, gameIsOver => {
+		if (gameIsOver) showStatistics.value = true;
+	});
+
 	onBeforeMount(() => {
 		document.addEventListener("keydown", onBeforeInput);
 	});
@@ -67,12 +81,18 @@
 
 <template>
 	<div class="app nightmode">
-		<GameHeader />
+		<GameHeader @openStats="showStatistics = true" />
 		<GameBoard
 			:solution="solution"
 			:maxGuesses="maxGuesses"
 			:activeRow="activeRow"
 			:guesses="guesses"
+		/>
+		<GameStatsDialog
+			v-model:isVisible="showStatistics"
+			:maxGuesses="maxGuesses"
+			:solution="solution"
+			:isGameLost="isGameLost"
 		/>
 	</div>
 </template>

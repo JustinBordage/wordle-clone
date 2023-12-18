@@ -38,6 +38,7 @@
 		width: 31rem;
 		margin-bottom: 2.5rem;
 		border-bottom: 0.0625rem solid var(--color-tone-3);
+		padding-bottom: 0.25rem;
 	}
 
 	.control-set {
