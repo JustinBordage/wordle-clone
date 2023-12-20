@@ -1,29 +1,23 @@
 <script setup lang="ts">
+	import type { ChartData, ChartOptions } from "chart.js";
 	import { Bar as BarChart } from "vue-chartjs";
-	import {
-		Chart as ChartJS,
-		Title,
-		Tooltip,
-		Legend,
-		BarElement,
-		CategoryScale,
-		LinearScale,
-		type ChartData,
-	} from "chart.js";
-
-	ChartJS.register(
-		Title,
-		Tooltip,
-		Legend,
-		BarElement,
-		CategoryScale,
-		LinearScale,
-	);
 
 	defineOptions({ name: "GuessDistribution" });
 
-	const chartOptions = {
+	const chartOptions: ChartOptions<"bar"> = {
 		responsive: true,
+		scales: {
+			y: {
+				ticks: {
+					beginAtZero: true,
+					callback(value: number): number | void {
+						if (value % 1 === 0) {
+							return value;
+						}
+					},
+				},
+			},
+		},
 	} as const;
 
 	const chartData: ChartData<"bar", number[]> = {
