@@ -1,13 +1,14 @@
 <script setup lang="ts">
-	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
 	import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
+	import { computedAsync } from "@vueuse/core";
 	import GameHeader from "@/components/GameHeader.vue";
 	import GameBoard from "@/components/GameBoard.vue";
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
+	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
 	import { validateWordle } from "@/composables/useWordleCheck.ts";
+	import { generateWordle } from "@/helpers/wordle.ts";
 	import GameTileState from "@/models/enums/GameTileState.ts";
 
-	const solution = "block";
 	const maxGuesses = 6;
 
 	const results = ref<GameTileState[][]>(Array(maxGuesses));
@@ -19,10 +20,13 @@
 	// while the "flip" animation is running.
 	const disabled = ref(false);
 
+	const solution = computedAsync(generateWordle, "");
 	const revealedGuesses = computed(() =>
 		guesses.value.slice(0, activeRow.value),
 	);
-	const isGameWon = computed(() => revealedGuesses.value.includes(solution));
+	const isGameWon = computed(() =>
+		revealedGuesses.value.includes(solution.value),
+	);
 	const isGameLost = computed(
 		() => activeRow.value >= maxGuesses && !isGameWon.value,
 	);
@@ -31,7 +35,7 @@
 	const guess = computed({
 		get: () => guesses.value[activeRow.value],
 		set(newGuess: string) {
-			if (newGuess.length <= solution.length) {
+			if (newGuess.length <= solution.value.length) {
 				guesses.value[activeRow.value] = newGuess;
 			}
 		},
@@ -48,7 +52,7 @@
 				guess.value = guess.value.slice(0, -1);
 				return;
 			case "Enter":
-				if (solution.length !== guess.value.length) return;
+				if (solution.value.length !== guess.value.length) return;
 
 				// TODO: Perform other validation like
 				//  - Is it a valid word
@@ -56,7 +60,10 @@
 				const currWord = guess.value;
 				if (currRow < maxGuesses) {
 					disabled.value = true;
-					results.value[currRow] = validateWordle(solution, currWord);
+					results.value[currRow] = validateWordle(
+						solution.value,
+						currWord,
+					);
 					activeRow.value++;
 				}
 				return;
@@ -82,7 +89,7 @@
 </script>
 
 <template>
-	<div class="app nightmode">
+	<div v-if="solution !== ''" class="app nightmode">
 		<GameHeader @openStats="showStatistics = true" />
 		<GameBoard
 			:solution="solution"

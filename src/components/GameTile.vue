@@ -65,7 +65,6 @@
 		line-height: 2rem;
 		font-weight: bold;
 		text-transform: uppercase;
-
 		border: 0.125rem solid black;
 	}
 
