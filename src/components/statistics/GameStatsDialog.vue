@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	import { computed } from "vue";
-	import Dialog from "primevue/dialog";
+	import Modal from "@/components/common/Modal.vue";
 	import GameStat from "@/components/statistics/GameStat.vue";
 	import GuessDistribution from "@/components/statistics/GuessDistribution.vue";
 
@@ -21,19 +21,14 @@
 		get(): boolean {
 			return props.isVisible;
 		},
-		set(newIsVisible: boolean) {
-			emit("update:isVisible", newIsVisible);
+		set(newVisible: boolean) {
+			emit("update:isVisible", newVisible);
 		},
 	});
 </script>
 
 <template>
-	<Dialog
-		class="game-stats-dialog"
-		modal
-		:draggable="false"
-		v-model:visible="visible"
-	>
+	<Modal class="game-stats-dialog" v-model:isVisible="visible">
 		<div v-if="isGameLost" class="game-stats__answer">
 			<h4>The Wordle was:</h4>
 			<var class="game-stats-dialog__answer-value">{{ solution }}</var>
@@ -46,19 +41,11 @@
 			<GameStat label="Max Streak" :value="0" />
 		</div>
 		<GuessDistribution />
-	</Dialog>
+	</Modal>
 </template>
 
 <style lang="scss">
 	.game-stats-dialog {
-		transform: translate(-50%, -50%);
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		border: 1px solid var(--color-tone-6);
-		background-color: var(--modal-content-bg);
-		padding: 1rem;
-
 		& h4 {
 			letter-spacing: 0.5px;
 			text-transform: uppercase;
@@ -91,25 +78,6 @@
 			flex-flow: row nowrap;
 			justify-content: center;
 			padding-bottom: 0.375rem;
-		}
-
-		& .p-dialog {
-			&-header {
-				padding: 0 0 0.25rem;
-				justify-content: flex-end;
-			}
-
-			&-header-close {
-				$size: 1.25rem;
-				width: $size;
-				height: $size;
-				font-size: $size;
-			}
-
-			&-header,
-			&-content {
-				background-color: transparent;
-			}
 		}
 	}
 </style>
