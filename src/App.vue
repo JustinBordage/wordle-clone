@@ -3,6 +3,7 @@
 	import { computedAsync } from "@vueuse/core";
 	import GameHeader from "@/components/GameHeader.vue";
 	import GameBoard from "@/components/GameBoard.vue";
+	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
 	import { validateWordle } from "@/composables/useWordleCheck";
@@ -16,6 +17,7 @@
 	const activeRow = ref(0);
 
 	const showStatistics = ref(false);
+	const showGameRules = ref(false);
 	// This will be used to disable the inputs
 	// while the "flip" animation is running.
 	const disabled = ref(false);
@@ -92,23 +94,27 @@
 
 <template>
 	<div v-if="solution !== ''" class="app nightmode">
-		<GameHeader @openStats="showStatistics = true" />
+		<GameHeader
+			@openRules="showGameRules = true"
+			@openStats="showStatistics = true"
+		/>
 		<GameBoard
 			:solution="solution"
 			:maxGuesses="maxGuesses"
 			:activeRow="activeRow"
 			:guesses="guesses"
 		/>
+		<GameKeyboard
+			:results="results"
+			:revealedGuesses="revealedGuesses"
+			@pressKey="pressKey"
+		/>
+		<GameRulesDialog v-model:isVisible="showGameRules" />
 		<GameStatsDialog
 			v-model:isVisible="showStatistics"
 			:maxGuesses="maxGuesses"
 			:solution="solution"
 			:isGameLost="isGameLost"
-		/>
-		<GameKeyboard
-			:results="results"
-			:revealedGuesses="revealedGuesses"
-			@pressKey="pressKey"
 		/>
 	</div>
 </template>

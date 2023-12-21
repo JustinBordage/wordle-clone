@@ -55,9 +55,9 @@
 	@include anims.FlipOut;
 
 	.game-tile {
-		$size: 3.875rem;
-		width: $size;
-		height: $size;
+		$defaultSize: 3.875rem;
+		width: var(--tile-size, $defaultSize);
+		height: var(--tile-size, $defaultSize);
 		display: inline-flex;
 		justify-content: center;
 		align-items: center;
