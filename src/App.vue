@@ -5,9 +5,9 @@
 	import GameBoard from "@/components/GameBoard.vue";
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
-	import { validateWordle } from "@/composables/useWordleCheck.ts";
-	import { generateWordle } from "@/helpers/wordle.ts";
-	import GameTileState from "@/models/enums/GameTileState.ts";
+	import { validateWordle } from "@/composables/useWordleCheck";
+	import { generateWordle } from "@/helpers/wordle";
+	import GameTileState from "@/models/enums/GameTileState";
 
 	const maxGuesses = 6;
 
@@ -41,7 +41,7 @@
 		},
 	});
 
-	const validKeys = /[A-Za-z]/;
+	const VALID_KEYS = /[A-Za-z]/;
 
 	function pressKey(key: string) {
 		switch (key) {
@@ -65,7 +65,7 @@
 				}
 				return;
 			default:
-				if (key.length === 1 && validKeys.test(key)) {
+				if (key.length === 1 && VALID_KEYS.test(key)) {
 					guess.value = guess.value + key.toUpperCase();
 				}
 				return;

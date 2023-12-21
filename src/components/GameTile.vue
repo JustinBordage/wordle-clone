@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { ref, watch } from "vue";
-	import GameTileAnimation from "@/models/enums/GameTileAnimation.ts";
-	import GameTileState from "@/models/enums/GameTileState.ts";
+	import GameTileAnimation from "@/models/enums/GameTileAnimation";
+	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "GameTile" });
 

@@ -2,7 +2,7 @@
 	import { computed } from "vue";
 	import { Icon } from "@iconify/vue";
 	import KeyboardKey from "@/components/keyboard/KeyboardKey.vue";
-	import GameTileState from "@/models/enums/GameTileState.ts";
+	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "GameKeyboard" });
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	import WordRow from "@/components/WordRow.vue";
-	import { useIdSetGenerator } from "@/composables/useIdSetGenerator.ts";
+	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
 
 	defineOptions({ name: "GameBoard" });
 

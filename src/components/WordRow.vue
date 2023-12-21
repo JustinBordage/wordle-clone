@@ -1,11 +1,11 @@
 <script setup lang="ts">
-	import { useIdSetGenerator } from "@/composables/useIdSetGenerator.ts";
+	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
 	import { computed, onUnmounted, ref } from "vue";
 	import GameTile from "@/components/GameTile.vue";
-	import useKeyHold from "@/composables/useKeyHold.ts";
-	import { useShakeElement } from "@/composables/useShakeElement.ts";
-	import { validateWordle } from "@/composables/useWordleCheck.ts";
-	import GameTileState from "@/models/enums/GameTileState.ts";
+	import useKeyHold from "@/composables/useKeyHold";
+	import { useShakeElement } from "@/composables/useShakeElement";
+	import { validateWordle } from "@/composables/useWordleCheck";
+	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "WordRow" });
 

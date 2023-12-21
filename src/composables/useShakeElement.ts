@@ -1,5 +1,5 @@
 import { Ref, watch } from "vue";
-import { RefOrGetter } from "@/models/types/vue.ts";
+import { RefOrGetter } from "@/models/types/vue";
 
 /** Requires a shake animation to be
  *  tied to the ".shake" selector. */
