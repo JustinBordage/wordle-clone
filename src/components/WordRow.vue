@@ -73,11 +73,6 @@
 
 	@include anims.Shake;
 
-	.wrapper {
-		display: flex;
-		flex-flow: column;
-	}
-
 	.word-row {
 		display: flex;
 		flex-flow: row nowrap;
