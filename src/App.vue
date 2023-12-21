@@ -43,10 +43,7 @@
 
 	const validKeys = /[A-Za-z]/;
 
-	function onBeforeInput(event: KeyboardEvent) {
-		const { key, altKey, ctrlKey } = event;
-		if (altKey || ctrlKey) return;
-
+	function pressKey(key: string) {
 		switch (key) {
 			case "Backspace":
 				guess.value = guess.value.slice(0, -1);
@@ -73,6 +70,11 @@
 				}
 				return;
 		}
+	}
+
+	function onBeforeInput(event: KeyboardEvent) {
+		const { key, altKey, ctrlKey } = event;
+		if (!altKey && !ctrlKey) pressKey(key);
 	}
 
 	watch(isGameOver, gameIsOver => {
@@ -103,7 +105,11 @@
 			:solution="solution"
 			:isGameLost="isGameLost"
 		/>
-		<GameKeyboard :results="results" :revealedGuesses="revealedGuesses" />
+		<GameKeyboard
+			:results="results"
+			:revealedGuesses="revealedGuesses"
+			@pressKey="pressKey"
+		/>
 	</div>
 </template>
 

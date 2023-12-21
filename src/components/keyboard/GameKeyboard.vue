@@ -6,6 +6,10 @@
 
 	defineOptions({ name: "GameKeyboard" });
 
+	defineEmits<{
+		(e: "pressKey", value: string);
+	}>();
+
 	const props = defineProps<{
 		results: GameTileState[][];
 		revealedGuesses: string[];
@@ -67,6 +71,7 @@
 				:key="`${rowIndex}-${colIndex}-${key}`"
 				:state="letterStates[key]"
 				:value="key"
+				@pressKey="$emit('pressKey', $event)"
 			>
 				<Icon
 					v-if="key === 'Backspace'"

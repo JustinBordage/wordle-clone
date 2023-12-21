@@ -4,6 +4,10 @@
 
 	defineOptions({ name: "KeyboardKey" });
 
+	defineEmits<{
+		(e: "pressKey", value: string);
+	}>();
+
 	const props = defineProps<{
 		value: string;
 		state?: GameTileState;
@@ -16,7 +20,7 @@
 	<button
 		:class="`keyboard-key${isOneAndAHalf ? ' one-and-a-half' : ''}`"
 		:data-state="state"
-		@click="$emit('keypress')"
+		@click="$emit('pressKey', value)"
 	>
 		<slot>
 			{{ value }}
