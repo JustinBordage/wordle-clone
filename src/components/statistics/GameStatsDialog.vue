@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { computed } from "vue";
+	import { computed, nextTick, watch } from "vue";
 	import Modal from "@/components/common/Modal.vue";
 	import GameStat from "@/components/statistics/GameStat.vue";
 	import GuessDistribution from "@/components/statistics/GuessDistribution.vue";
@@ -25,11 +25,27 @@
 			emit("update:isVisible", newVisible);
 		},
 	});
+
+	watch(
+		() => props.isVisible,
+		isVisible => {
+			if (isVisible) {
+				nextTick(() => {
+					const { activeElement } = document;
+					if (
+						activeElement?.matches("button.p-dialog-header-close")
+					) {
+						(activeElement as HTMLButtonElement).blur();
+					}
+				});
+			}
+		},
+	);
 </script>
 
 <template>
 	<Modal class="game-stats-dialog" v-model:isVisible="visible">
-		<div v-if="isGameLost" class="game-stats__answer">
+		<div v-if="isGameLost" class="game-stats-dialog__answer">
 			<h4>The Wordle was:</h4>
 			<var class="game-stats-dialog__answer-value">{{ solution }}</var>
 		</div>
@@ -62,7 +78,7 @@
 			flex-flow: column;
 			align-items: center;
 			background-color: #f008;
-			margin-bottom: 1.5rem;
+			margin: 1rem 0 1.5rem;
 			border-radius: 0.5rem;
 			padding: 0.5rem;
 		}
