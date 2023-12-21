@@ -43,6 +43,20 @@
 		},
 	});
 
+	const submitWord = () => {
+		if (solution.value.length !== guess.value.length) return;
+
+		// TODO: Perform other validation like
+		//  - Is it a valid word
+		const currRow = activeRow.value;
+		const currWord = guess.value;
+		if (currRow < maxGuesses) {
+			disabled.value = true;
+			results.value[currRow] = validateWordle(solution.value, currWord);
+			activeRow.value++;
+		}
+	};
+
 	const VALID_KEYS = /[A-Za-z]/;
 
 	function pressKey(key: string) {
@@ -51,20 +65,7 @@
 				guess.value = guess.value.slice(0, -1);
 				return;
 			case "Enter":
-				if (solution.value.length !== guess.value.length) return;
-
-				// TODO: Perform other validation like
-				//  - Is it a valid word
-				const currRow = activeRow.value;
-				const currWord = guess.value;
-				if (currRow < maxGuesses) {
-					disabled.value = true;
-					results.value[currRow] = validateWordle(
-						solution.value,
-						currWord,
-					);
-					activeRow.value++;
-				}
+				submitWord();
 				return;
 			default:
 				if (key.length === 1 && VALID_KEYS.test(key)) {
