@@ -2,6 +2,10 @@
 	import { computed } from "vue";
 	import Modal from "@/components/common/Modal.vue";
 	import GameRulesExample from "@/components/rules/GameRulesExample.vue";
+	import {
+		MAX_GUESSES,
+		WORDLE_LENGTH,
+	} from "@/configuration/magic-numbers.ts";
 	import GameTileState from "@/models/enums/GameTileState.ts";
 
 	defineOptions({ name: "GameRulesDialog" });
@@ -31,10 +35,10 @@
 		v-model:isVisible="visible"
 	>
 		<section>
-			<p>Guess the <b>WORDLE</b> in 6 tries.</p>
+			<p>Guess the <b>WORDLE</b> in {{ MAX_GUESSES }} tries.</p>
 			<p>
-				Each guess must be a valid 5 letter word. Hit the enter button
-				to submit.
+				Each guess must be a valid {{ WORDLE_LENGTH }} letter word. Hit
+				the enter button to submit.
 			</p>
 			<p>
 				After each guess, the color of the tiles will change to show how

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
 	import { computed, onUnmounted, ref } from "vue";
 	import GameTile from "@/components/GameTile.vue";
+	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
 	import useKeyHold from "@/composables/useKeyHold";
 	import { useShakeElement } from "@/composables/useShakeElement";
 	import { validateWordle } from "@/composables/useWordleCheck";

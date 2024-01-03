@@ -11,7 +11,6 @@
 	}>();
 
 	const props = defineProps<{
-		maxGuesses: number;
 		isGameLost: boolean;
 		solution: string;
 		isVisible: boolean;

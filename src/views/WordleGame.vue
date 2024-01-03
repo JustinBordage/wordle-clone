@@ -102,7 +102,6 @@
 		/>
 		<GameBoard
 			:solution="solution"
-			:maxGuesses="MAX_GUESSES"
 			:activeRow="activeRow"
 			:guesses="guesses"
 		/>
@@ -114,7 +113,6 @@
 		<GameRulesDialog v-model:isVisible="showGameRules" />
 		<GameStatsDialog
 			v-model:isVisible="showStatistics"
-			:maxGuesses="MAX_GUESSES"
 			:solution="solution"
 			:isGameLost="isGameLost"
 		/>

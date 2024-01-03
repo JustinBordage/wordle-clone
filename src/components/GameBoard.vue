@@ -1,18 +1,18 @@
 <script setup lang="ts">
 	import WordRow from "@/components/WordRow.vue";
 	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
+	import { MAX_GUESSES } from "@/configuration/magic-numbers.ts";
 
 	defineOptions({ name: "GameBoard" });
 
-	const props = defineProps<{
+	defineProps<{
 		solution: string;
-		maxGuesses: number;
 		guesses: string[];
 		activeRow: number;
 	}>();
 
 	// ----- Composables -----
-	const rowIds = useIdSetGenerator(() => props.maxGuesses);
+	const rowIds = useIdSetGenerator(() => MAX_GUESSES);
 </script>
 
 <template>
