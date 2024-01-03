@@ -1,5 +1,8 @@
-export async function getWordsList(wordLength: number): Promise<string[]> {
-	const resp = await fetch(`/api/words/${wordLength}.json`, {
+export async function getWordsList(
+	wordLength: number,
+	language: string = "en",
+): Promise<string[]> {
+	const resp = await fetch(`/api/words/${language}/${wordLength}.json`, {
 		method: "GET",
 	});
 
