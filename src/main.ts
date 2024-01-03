@@ -13,6 +13,7 @@ import {
 	CategoryScale,
 	LinearScale,
 } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(
 	Title,
@@ -21,6 +22,7 @@ ChartJS.register(
 	BarElement,
 	CategoryScale,
 	LinearScale,
+	ChartDataLabels,
 );
 
 createApp(App)
@@ -35,5 +37,3 @@ createApp(App)
 		},
 	})
 	.mount("#app");
-
-
