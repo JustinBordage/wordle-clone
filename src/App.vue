@@ -6,14 +6,13 @@
 	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
+	import { MAX_GUESSES } from "@/configuration/magic-numbers.ts";
 	import { validateWordle } from "@/composables/useWordleCheck";
 	import { generateWordle } from "@/helpers/wordle";
 	import GameTileState from "@/models/enums/GameTileState";
 
-	const maxGuesses = 6;
-
-	const results = ref<GameTileState[][]>(Array(maxGuesses));
-	const guesses = ref<string[]>(Array(maxGuesses).fill(""));
+	const results = ref<GameTileState[][]>(Array(MAX_GUESSES));
+	const guesses = ref<string[]>(Array(MAX_GUESSES).fill(""));
 	const activeRow = ref(0);
 
 	const showStatistics = ref(false);
@@ -30,7 +29,7 @@
 		revealedGuesses.value.includes(solution.value),
 	);
 	const isGameLost = computed(
-		() => activeRow.value >= maxGuesses && !isGameWon.value,
+		() => activeRow.value >= MAX_GUESSES && !isGameWon.value,
 	);
 	const isGameOver = computed(() => isGameLost.value || isGameWon.value);
 
@@ -50,7 +49,7 @@
 		//  - Is it a valid word
 		const currRow = activeRow.value;
 		const currWord = guess.value;
-		if (currRow < maxGuesses) {
+		if (currRow < MAX_GUESSES) {
 			disabled.value = true;
 			results.value[currRow] = validateWordle(solution.value, currWord);
 			activeRow.value++;
@@ -101,7 +100,7 @@
 		/>
 		<GameBoard
 			:solution="solution"
-			:maxGuesses="maxGuesses"
+			:maxGuesses="MAX_GUESSES"
 			:activeRow="activeRow"
 			:guesses="guesses"
 		/>
@@ -113,7 +112,7 @@
 		<GameRulesDialog v-model:isVisible="showGameRules" />
 		<GameStatsDialog
 			v-model:isVisible="showStatistics"
-			:maxGuesses="maxGuesses"
+			:maxGuesses="MAX_GUESSES"
 			:solution="solution"
 			:isGameLost="isGameLost"
 		/>
