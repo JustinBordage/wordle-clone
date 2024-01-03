@@ -20,6 +20,7 @@
 			<GameTile
 				v-for="(letter, index) in word"
 				:key="`${letter}-${index}`"
+				class="game-example__tile"
 				:letter="letter"
 				:state="index === revealIndex ? state : GameTileState.TBD"
 			/>
@@ -38,6 +39,20 @@
 			flex-flow: row nowrap;
 			align-items: center;
 			gap: 0.375rem;
+		}
+
+		&__tile {
+			&[data-state="ABSENT"] {
+				border-color: var(--color-absent);
+			}
+
+			&[data-state="PRESENT"] {
+				border-color: var(--color-present);
+			}
+
+			&[data-state="CORRECT"] {
+				border-color: var(--color-correct);
+			}
 		}
 	}
 </style>

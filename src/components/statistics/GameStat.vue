@@ -32,6 +32,7 @@
 			font-size: 2.25rem;
 			font-weight: 400;
 			max-height: fit-content;
+			font-style: normal;
 		}
 
 		&__label {
