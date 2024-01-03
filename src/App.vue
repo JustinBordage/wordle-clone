@@ -7,6 +7,9 @@
 		components: {
 			WordleGame,
 		},
+		mounted() {
+			this.$primevue.config.ripple = true;
+		},
 	});
 </script>
 

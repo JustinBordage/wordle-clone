@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import PrimeVue from "primevue/config";
+import Ripple from "primevue/ripple";
 import { createPinia } from "pinia";
 import App from "@/App.vue";
 import "@/styles/prime-vue/theme.scss";
@@ -35,5 +36,7 @@ createApp(App)
 				},
 			},
 		},
+		ripple: true,
 	})
+	.directive("ripple", Ripple)
 	.mount("#app");
