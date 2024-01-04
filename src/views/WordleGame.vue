@@ -13,6 +13,7 @@
 	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
+	import useIsValidWord from "@/composables/useIsValidWord.ts";
 	import { MAX_GUESSES } from "@/configuration/magic-numbers.ts";
 	import { DO_FAST_FLIP } from "@/configuration/provider-keys.ts";
 	import { validateWordle } from "@/composables/useWordleCheck";
@@ -59,16 +60,26 @@
 	});
 
 	const submitWord = () => {
-		if (solution.value.length !== guess.value.length) return;
+		const currGuess = guess.value;
+		if (solution.value.length !== currGuess.length) return;
 
-		// TODO: Perform other validation like
-		//  - Is it a valid word
+		if (!isValidWord(currGuess)) {
+			// TODO: Replace this with something less intrusive
+			alert("This word is not valid!");
+			return;
+		}
+
+		if (revealedGuesses.value.includes(currGuess)) {
+			// TODO: Replace this with something less intrusive
+			alert("This word has already been used!");
+			return;
+		}
+
 		const currRow = activeRow.value;
-		const currWord = guess.value;
 		if (currRow < MAX_GUESSES) {
 			disabled.value = true;
 			doFastFlip.value = false;
-			results.value[currRow] = validateWordle(solution.value, currWord);
+			results.value[currRow] = validateWordle(solution.value, currGuess);
 			activeRow.value++;
 		}
 	};
@@ -95,6 +106,8 @@
 		const { key, altKey, ctrlKey } = event;
 		if (!altKey && !ctrlKey) pressKey(key);
 	}
+
+	const isValidWord = useIsValidWord(() => solution.value.length);
 
 	provide(DO_FAST_FLIP, doFastFlip);
 
