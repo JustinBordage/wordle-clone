@@ -8,20 +8,24 @@
 		watch,
 	} from "vue";
 	import { computedAsync } from "@vueuse/core";
-	import GameHeader from "@/components/GameHeader.vue";
 	import GameBoard from "@/components/GameBoard.vue";
+	import GameHeader from "@/components/GameHeader.vue";
+	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
 	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
-	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
-	import useIsValidWord from "@/composables/useIsValidWord.ts";
-	import { MAX_GUESSES } from "@/configuration/magic-numbers.ts";
-	import { DO_FAST_FLIP } from "@/configuration/provider-keys.ts";
+	import useIsValidWord from "@/composables/useIsValidWord";
 	import { validateWordle } from "@/composables/useWordleCheck";
+	import { MAX_GUESSES } from "@/configuration/magic-numbers";
+	import { DO_FAST_FLIP } from "@/configuration/provider-keys";
+	import { evalGameStatus, hasGameEnded } from "@/helpers/game-status";
 	import { generateWordle } from "@/helpers/wordle";
+	import GameStatus from "@/models/enums/GameStatus";
 	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "WordleGame" });
 
+	// ----- Data -----
+	const gameStatus = ref(GameStatus.NOT_STARTED);
 	const results = ref<GameTileState[][]>(Array(MAX_GUESSES));
 	const guesses = ref<string[]>(Array(MAX_GUESSES).fill(""));
 	const activeRow = ref(0);
@@ -38,17 +42,12 @@
 	 *   so I may refactor it later. */
 	const doFastFlip = ref(true);
 
+	// ----- Computed -----
 	const solution = computedAsync(generateWordle, "");
 	const revealedGuesses = computed(() =>
 		guesses.value.slice(0, activeRow.value),
 	);
-	const isGameWon = computed(() =>
-		revealedGuesses.value.includes(solution.value),
-	);
-	const isGameLost = computed(
-		() => activeRow.value >= MAX_GUESSES && !isGameWon.value,
-	);
-	const isGameOver = computed(() => isGameLost.value || isGameWon.value);
+	const isGameOver = computed(() => hasGameEnded(gameStatus.value));
 
 	const guess = computed({
 		get: () => guesses.value[activeRow.value],
@@ -59,6 +58,7 @@
 		},
 	});
 
+	// ----- Methods -----
 	const submitWord = () => {
 		const currGuess = guess.value;
 		if (solution.value.length !== currGuess.length) return;
@@ -77,16 +77,23 @@
 
 		const currRow = activeRow.value;
 		if (currRow < MAX_GUESSES) {
+			activeRow.value++;
 			disabled.value = true;
 			doFastFlip.value = false;
 			results.value[currRow] = validateWordle(solution.value, currGuess);
-			activeRow.value++;
+			gameStatus.value = evalGameStatus(
+				solution,
+				revealedGuesses,
+				activeRow,
+			);
 		}
 	};
 
 	const VALID_KEYS = /[A-Za-z]/;
 
 	function pressKey(key: string) {
+		if (isGameOver.value) return;
+
 		switch (key) {
 			case "Backspace":
 				guess.value = guess.value.slice(0, -1);
@@ -107,14 +114,18 @@
 		if (!altKey && !ctrlKey) pressKey(key);
 	}
 
+	// ----- Composables -----
 	const isValidWord = useIsValidWord(() => solution.value.length);
 
+	// ----- Providers -----
 	provide(DO_FAST_FLIP, doFastFlip);
 
+	// ----- Watchers -----
 	watch(isGameOver, gameIsOver => {
 		if (gameIsOver) showStatistics.value = true;
 	});
 
+	// ----- Lifecycle Methods -----
 	onBeforeMount(() => {
 		document.addEventListener("keydown", onBeforeInput);
 	});
@@ -144,7 +155,7 @@
 		<GameStatsDialog
 			v-model:isVisible="showStatistics"
 			:solution="solution"
-			:isGameLost="isGameLost"
+			:isGameLost="gameStatus === GameStatus.LOST"
 		/>
 	</div>
 </template>
