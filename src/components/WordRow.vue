@@ -1,10 +1,11 @@
 <script setup lang="ts">
-	import { computed, onUnmounted, ref } from "vue";
+	import { computed, inject, onUnmounted, ref } from "vue";
 	import GameTile from "@/components/GameTile.vue";
 	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
 	import useKeyHold from "@/composables/useKeyHold";
 	import { useShakeElement } from "@/composables/useShakeElement";
 	import { validateWordle } from "@/composables/useWordleCheck";
+	import { DO_FAST_FLIP } from "@/configuration/provider-keys.ts";
 	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "WordRow" });
@@ -15,6 +16,9 @@
 		isRevealed: boolean;
 		isActiveRow: boolean;
 	}>();
+
+	// ----- Injects -----
+	const doFastFlip = inject(DO_FAST_FLIP, false);
 
 	// ----- Data -----
 	const row = ref<HTMLDivElement | null>(null);
@@ -62,8 +66,10 @@
 		<GameTile
 			v-for="(id, index) in tileIds"
 			:key="id"
+			:doFastFlip="doFastFlip"
 			:letter="paddedGuess[index]"
 			:state="tileState[index]!!"
+			:tileIndex="index"
 		/>
 	</div>
 </template>

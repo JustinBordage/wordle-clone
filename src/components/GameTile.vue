@@ -1,43 +1,75 @@
 <script setup lang="ts">
-	import { ref, watch } from "vue";
+	import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 	import GameTileAnimation from "@/models/enums/GameTileAnimation";
-	import GameTileState from "@/models/enums/GameTileState";
+	import GameTileState, {
+		isRevealedState,
+	} from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "GameTile" });
 
-	const props = defineProps<{
-		state: GameTileState;
-		letter: string;
-	}>();
+	const props = withDefaults(
+		defineProps<{
+			state: GameTileState;
+			letter: string;
+			tileIndex?: number;
+			doFastFlip?: boolean;
+		}>(),
+		{
+			tileIndex: 0,
+			doFastFlip: false,
+		},
+	);
 
 	const tileRef = ref<HTMLDivElement>();
 	const animation = ref(GameTileAnimation.IDLE);
+	const shownState = ref(GameTileState.EMPTY);
 
 	watch(
 		() => props.state,
 		function (newState, oldState) {
-			if (
-				newState === GameTileState.TBD &&
-				oldState === GameTileState.EMPTY
-			) {
-				animation.value = GameTileAnimation.POP;
-				tileRef.value?.addEventListener(
-					"animationend",
-					() => {
-						animation.value = GameTileAnimation.IDLE;
-					},
-					{ once: true },
-				);
+			switch (newState) {
+				case GameTileState.TBD:
+					if (oldState === GameTileState.EMPTY) {
+						animation.value = GameTileAnimation.POP;
+					}
+					break;
+				case GameTileState.ABSENT:
+				case GameTileState.PRESENT:
+				case GameTileState.CORRECT:
+					animation.value = GameTileAnimation.FLIP_IN;
+					break;
+			}
+
+			if (!isRevealedState(newState)) {
+				shownState.value = newState;
 			}
 		},
 		{ immediate: true },
 	);
+
+	function returnToIdle() {
+		if (animation.value === GameTileAnimation.FLIP_IN) {
+			animation.value = GameTileAnimation.FLIP_OUT;
+			shownState.value = props.state;
+			return;
+		}
+
+		animation.value = GameTileAnimation.IDLE;
+	}
+
+	onMounted(() => {
+		tileRef.value?.addEventListener("animationend", returnToIdle);
+	});
+
+	onBeforeUnmount(() => {
+		tileRef.value?.removeEventListener("animationend", returnToIdle);
+	});
 </script>
 
 <template>
 	<div
-		:class="$bem({})"
-		:data-state="state"
+		:class="$bem({ m: { 'fast-flip': doFastFlip } })"
+		:data-state="shownState"
 		:data-animation="animation"
 		ref="tileRef"
 	>
@@ -46,9 +78,8 @@
 </template>
 
 <style lang="scss">
+	@use "sass:math";
 	@use "@/styles/wordle/animations.scss" as anims;
-
-	$emptyTileBorder: 2px solid;
 
 	@include anims.PopIn;
 	@include anims.FlipIn;
@@ -65,15 +96,19 @@
 		line-height: 2rem;
 		font-weight: bold;
 		text-transform: uppercase;
-		border: 0.125rem solid black;
+
+		&[data-state="EMPTY"],
+		&[data-state="TBD"] {
+			border: 0.125rem solid transparent;
+		}
 
 		&[data-state="EMPTY"] {
-			border: $emptyTileBorder var(--color-tone-4);
+			border-color: var(--color-tone-4);
 		}
 
 		&[data-state="TBD"] {
 			background-color: var(--color-tone-7);
-			border: $emptyTileBorder var(--color-tone-3);
+			border-color: var(--color-tone-3);
 			color: var(--color-tone-1);
 		}
 
@@ -94,14 +129,23 @@
 			animation-duration: 100ms;
 		}
 
+		$defFlipDuration: 250ms;
+
+		&--fast-flip {
+			--flip-duration: #{math.div($defFlipDuration, 2)};
+		}
+
 		&[data-animation="flip-in"],
 		&[data-animation="flip-out"] {
-			animation-duration: 250ms;
+			animation-duration: $defFlipDuration;
 			animation-timing-function: ease-in;
 		}
 
 		&[data-animation="flip-in"] {
 			animation-name: FlipIn;
+			animation-delay: calc(
+				v-bind(tileIndex) * var(--flip-duration, $defFlipDuration)
+			);
 		}
 
 		&[data-animation="flip-out"] {

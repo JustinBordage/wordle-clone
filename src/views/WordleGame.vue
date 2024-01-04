@@ -1,5 +1,12 @@
 <script setup lang="ts">
-	import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
+	import {
+		computed,
+		onBeforeMount,
+		onUnmounted,
+		provide,
+		ref,
+		watch,
+	} from "vue";
 	import { computedAsync } from "@vueuse/core";
 	import GameHeader from "@/components/GameHeader.vue";
 	import GameBoard from "@/components/GameBoard.vue";
@@ -7,6 +14,7 @@
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
 	import { MAX_GUESSES } from "@/configuration/magic-numbers.ts";
+	import { DO_FAST_FLIP } from "@/configuration/provider-keys.ts";
 	import { validateWordle } from "@/composables/useWordleCheck";
 	import { generateWordle } from "@/helpers/wordle";
 	import GameTileState from "@/models/enums/GameTileState";
@@ -22,6 +30,12 @@
 	// This will be used to disable the inputs
 	// while the "flip" animation is running.
 	const disabled = ref(false);
+	/** Used to trigger a faster flipping animation when
+	 *  loading the game state from local storage.
+	 *
+	 *  @remark This is a bit of a hacky solution,
+	 *   so I may refactor it later. */
+	const doFastFlip = ref(true);
 
 	const solution = computedAsync(generateWordle, "");
 	const revealedGuesses = computed(() =>
@@ -53,6 +67,7 @@
 		const currWord = guess.value;
 		if (currRow < MAX_GUESSES) {
 			disabled.value = true;
+			doFastFlip.value = false;
 			results.value[currRow] = validateWordle(solution.value, currWord);
 			activeRow.value++;
 		}
@@ -80,6 +95,8 @@
 		const { key, altKey, ctrlKey } = event;
 		if (!altKey && !ctrlKey) pressKey(key);
 	}
+
+	provide(DO_FAST_FLIP, doFastFlip);
 
 	watch(isGameOver, gameIsOver => {
 		if (gameIsOver) showStatistics.value = true;

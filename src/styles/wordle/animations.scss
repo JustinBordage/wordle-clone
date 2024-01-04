@@ -14,10 +14,10 @@
 
 @mixin FlipIn {
 	@keyframes FlipIn {
-		0% {
+		from {
 			transform: rotateX(0);
 		}
-		100% {
+		to {
 			transform: rotateX(-90deg);
 		}
 	}
@@ -25,10 +25,10 @@
 
 @mixin FlipOut {
 	@keyframes FlipOut {
-		0% {
+		from {
 			transform: rotateX(-90deg);
 		}
-		100% {
+		to {
 			transform: rotateX(0);
 		}
 	}
