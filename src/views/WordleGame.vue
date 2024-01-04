@@ -28,7 +28,6 @@
 	const gameStatus = ref(GameStatus.NOT_STARTED);
 	const results = ref<GameTileState[][]>(Array(MAX_GUESSES));
 	const guesses = ref<string[]>(Array(MAX_GUESSES).fill(""));
-	const activeRow = ref(0);
 
 	const showStatistics = ref(false);
 	const showGameRules = ref(false);
@@ -44,6 +43,9 @@
 
 	// ----- Computed -----
 	const solution = computedAsync(generateWordle, "");
+	const activeRow = computed(
+		() => results.value.filter(result => !!result).length,
+	);
 	const revealedGuesses = computed(() =>
 		guesses.value.slice(0, activeRow.value),
 	);
@@ -77,7 +79,6 @@
 
 		const currRow = activeRow.value;
 		if (currRow < MAX_GUESSES) {
-			activeRow.value++;
 			disabled.value = true;
 			doFastFlip.value = false;
 			results.value[currRow] = validateWordle(solution.value, currGuess);
