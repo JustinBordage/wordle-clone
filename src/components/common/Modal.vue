@@ -24,9 +24,14 @@
 </script>
 
 <template>
-	<Dialog class="modal" modal :draggable="false" v-model:visible="visible">
+	<Dialog
+		:class="$bem({})"
+		modal
+		:draggable="false"
+		v-model:visible="visible"
+	>
 		<template v-if="title" #header>
-			<h2 class="modal__title">{{ title }}</h2>
+			<h2 :class="$bem({ e: 'title' })">{{ title }}</h2>
 		</template>
 		<slot />
 	</Dialog>

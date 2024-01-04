@@ -8,11 +8,11 @@
 </script>
 
 <template>
-	<div class="game-stat">
-		<var class="game-stat__value">
+	<div :class="$bem({})">
+		<var :class="$bem({ e: 'value' })">
 			{{ value }}
 		</var>
-		<label class="game-stat__label">
+		<label :class="$bem({ e: 'label' })">
 			{{ label }}
 		</label>
 	</div>

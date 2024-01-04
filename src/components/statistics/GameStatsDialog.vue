@@ -43,13 +43,13 @@
 </script>
 
 <template>
-	<Modal class="game-stats-dialog" v-model:isVisible="visible">
-		<div v-if="isGameLost" class="game-stats-dialog__answer">
+	<Modal :class="$bem({})" v-model:isVisible="visible">
+		<div v-if="isGameLost" :class="$bem({ e: 'answer' })">
 			<h4>The Wordle was:</h4>
-			<var class="game-stats-dialog__answer-value">{{ solution }}</var>
+			<var :class="$bem({ e: 'solution' })">{{ solution }}</var>
 		</div>
-		<h4 class="game-stats-dialog__title">Statistics</h4>
-		<div class="game-stats-dialog__wrapper">
+		<h4 :class="$bem({ e: 'title' })">Statistics</h4>
+		<div :class="$bem({ e: 'wrapper' })">
 			<GameStat label="Games Played" :value="0" />
 			<GameStat label="Win %" :value="0" />
 			<GameStat label="Current Streak" :value="0" />
@@ -82,7 +82,7 @@
 			padding: 0.5rem;
 		}
 
-		&__answer-value {
+		&__solution {
 			text-transform: uppercase;
 			letter-spacing: 0.5px;
 			text-align: center;

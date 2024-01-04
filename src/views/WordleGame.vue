@@ -95,7 +95,7 @@
 </script>
 
 <template>
-	<div v-if="solution !== ''" class="wordle-game nightmode">
+	<div v-if="solution !== ''" :class="$bem({})">
 		<GameHeader
 			@openRules="showGameRules = true"
 			@openStats="showStatistics = true"

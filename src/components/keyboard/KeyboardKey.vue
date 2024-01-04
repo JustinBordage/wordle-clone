@@ -18,7 +18,7 @@
 
 <template>
 	<button
-		:class="`keyboard-key${isOneAndAHalf ? ' one-and-a-half' : ''}`"
+		:class="$bem({ m: { 'one-and-a-half': isOneAndAHalf } })"
 		:data-state="state"
 		@click="$emit('pressKey', value)"
 	>
@@ -49,7 +49,7 @@
 		color: var(--key-text-color);
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
 
-		&.one-and-a-half {
+		&--one-and-a-half {
 			width: $keyWidth * 1.5;
 			min-width: $keyWidth * 1.5;
 		}

@@ -60,11 +60,11 @@
 </script>
 
 <template>
-	<div class="game-keyboard">
+	<div :class="$bem({})">
 		<div
 			v-for="(keySet, rowIndex) in keyboardKeys"
 			:key="`${rowIndex}-${keySet.join()}`"
-			:class="`game-keyboard__row game-keyboard__row--${rowIndex}`"
+			:class="$bem({ e: 'row', m: `${rowIndex}` })"
 		>
 			<KeyboardKey
 				v-for="(key, colIndex) in keySet"

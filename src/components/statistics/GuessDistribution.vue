@@ -67,10 +67,10 @@
 </script>
 
 <template>
-	<div class="guess-distribution">
-		<h4 class="guess-distribution__title">Guess Distribution</h4>
+	<div :class="$bem({})">
+		<h4 :class="$bem({ e: 'title' })">Guess Distribution</h4>
 		<BarChart
-			id="guess-distribution__chart"
+			:class="$bem({ e: 'chart' })"
 			:options="chartOptions"
 			:data="chartData"
 		/>

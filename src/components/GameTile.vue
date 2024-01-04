@@ -36,7 +36,7 @@
 
 <template>
 	<div
-		class="game-tile tile"
+		:class="$bem({})"
 		:data-state="state"
 		:data-animation="animation"
 		ref="tileRef"
@@ -66,9 +66,7 @@
 		font-weight: bold;
 		text-transform: uppercase;
 		border: 0.125rem solid black;
-	}
 
-	.tile {
 		&[data-state="EMPTY"] {
 			border: $emptyTileBorder var(--color-tone-4);
 		}

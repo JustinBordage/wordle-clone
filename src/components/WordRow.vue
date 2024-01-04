@@ -58,7 +58,7 @@
 </script>
 
 <template>
-	<div class="word-row" ref="row">
+	<div :class="$bem({})" ref="row">
 		<GameTile
 			v-for="(id, index) in tileIds"
 			:key="id"

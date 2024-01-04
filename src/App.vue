@@ -14,5 +14,7 @@
 </script>
 
 <template>
-	<WordleGame />
+	<div class="nightmode">
+		<WordleGame />
+	</div>
 </template>

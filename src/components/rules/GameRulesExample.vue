@@ -15,24 +15,24 @@
 </script>
 
 <template>
-	<div class="game-example">
-		<div class="game-example__row">
+	<div :class="$bem({})">
+		<div :class="$bem({ e: 'row' })">
 			<GameTile
 				v-for="(letter, index) in word"
 				:key="`${letter}-${index}`"
-				class="game-example__tile"
+				:class="$bem({ e: 'tile' })"
 				:letter="letter"
 				:state="index === revealIndex ? state : GameTileState.TBD"
 			/>
 		</div>
-		<p class="game-example__description">
+		<p :class="$bem({ e: 'description' })">
 			<slot />
 		</p>
 	</div>
 </template>
 
 <style lang="scss">
-	.game-example {
+	.game-rules-example {
 		&__row {
 			--tile-size: 2.5rem;
 			display: flex;
