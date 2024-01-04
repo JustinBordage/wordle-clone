@@ -22,10 +22,23 @@
 		},
 	);
 
+	// ----- Data -----
 	const tileRef = ref<HTMLDivElement>();
 	const animation = ref(GameTileAnimation.IDLE);
 	const shownState = ref(GameTileState.EMPTY);
 
+	// ----- Methods -----
+	function returnToIdle() {
+		if (animation.value === GameTileAnimation.FLIP_IN) {
+			animation.value = GameTileAnimation.FLIP_OUT;
+			shownState.value = props.state;
+			return;
+		}
+
+		animation.value = GameTileAnimation.IDLE;
+	}
+
+	// ----- Watchers -----
 	watch(
 		() => props.state,
 		function (newState, oldState) {
@@ -49,16 +62,7 @@
 		{ immediate: true },
 	);
 
-	function returnToIdle() {
-		if (animation.value === GameTileAnimation.FLIP_IN) {
-			animation.value = GameTileAnimation.FLIP_OUT;
-			shownState.value = props.state;
-			return;
-		}
-
-		animation.value = GameTileAnimation.IDLE;
-	}
-
+	// ----- Lifecycle Methods -----
 	onMounted(() => {
 		tileRef.value?.addEventListener("animationend", returnToIdle);
 	});
