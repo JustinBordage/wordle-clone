@@ -4,7 +4,7 @@ import {
 	englishRecommendedTransformers,
 } from "obscenity";
 import { getWordsList } from "@/adapters/wordle";
-import { WORDLE_LENGTH } from "@/configuration/magic-numbers.ts";
+import { WORDLE_LENGTH } from "@/configuration/magic-numbers";
 import { pickRandomWord } from "@/utils/RandomUtils";
 
 function getProfanityChecker(): RegExpMatcher {

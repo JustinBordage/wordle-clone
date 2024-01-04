@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import WordRow from "@/components/WordRow.vue";
 	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
-	import { MAX_GUESSES } from "@/configuration/magic-numbers.ts";
+	import { MAX_GUESSES } from "@/configuration/magic-numbers";
 
 	defineOptions({ name: "GameBoard" });
 

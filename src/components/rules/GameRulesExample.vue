@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { computed } from "vue";
 	import GameTile from "@/components/GameTile.vue";
-	import GameTileState from "@/models/enums/GameTileState.ts";
+	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "GameRulesExample" });
 

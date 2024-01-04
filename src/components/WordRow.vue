@@ -5,7 +5,7 @@
 	import useKeyHold from "@/composables/useKeyHold";
 	import { useShakeElement } from "@/composables/useShakeElement";
 	import { validateWordle } from "@/composables/useWordleCheck";
-	import { DO_FAST_FLIP } from "@/configuration/provider-keys.ts";
+	import { DO_FAST_FLIP } from "@/configuration/provider-keys";
 	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "WordRow" });
