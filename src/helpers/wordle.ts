@@ -1,6 +1,45 @@
+import {
+	RegExpMatcher,
+	englishDataset,
+	englishRecommendedTransformers,
+} from "obscenity";
 import { getWordsList } from "@/adapters/wordle";
 import { WORDLE_LENGTH } from "@/configuration/magic-numbers.ts";
-import { randomInt } from "@/utils/RandomUtils";
+import { pickRandomWord } from "@/utils/RandomUtils";
+
+function getProfanityChecker(): RegExpMatcher {
+	return new RegExpMatcher({
+		...englishDataset.build(),
+		...englishRecommendedTransformers,
+	});
+}
+
+/** Chooses a non-profane word as the Wordle, since we don't
+ *  want the game to be teaching profanities to the users. */
+function getSafeWord(wordList: string[]): string {
+	const profanityChecker = getProfanityChecker();
+	let wordle: string | null = null;
+	let attempts = 0;
+
+	while (wordle === null && attempts < 10) {
+		const uncheckedWord = pickRandomWord(wordList);
+		if (!profanityChecker.hasMatch(uncheckedWord)) {
+			wordle = uncheckedWord;
+		}
+		attempts++;
+	}
+
+	if (wordle === null) {
+		// While less efficient, this fallback
+		// will guarantee a word is selected.
+		const sanitizedWordList = wordList.filter(
+			word => !profanityChecker.hasMatch(word),
+		);
+		wordle = pickRandomWord(sanitizedWordList);
+	}
+
+	return wordle;
+}
 
 export async function generateWordle() {
 	const words = await getWordsList(WORDLE_LENGTH);
@@ -8,5 +47,5 @@ export async function generateWordle() {
 		throw new Error("Failed to generate Wordle!");
 	}
 
-	return words[randomInt(0, words.length)];
+	return getSafeWord(words);
 }
