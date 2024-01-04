@@ -5,6 +5,7 @@ import { createPinia } from "pinia";
 import App from "@/App.vue";
 import "@/styles/prime-vue/theme.scss";
 import "@/styles/common.scss";
+import { createBem } from "@/mixins/bem";
 import {
 	Chart as ChartJS,
 	Title,
@@ -39,4 +40,9 @@ createApp(App)
 		ripple: true,
 	})
 	.directive("ripple", Ripple)
+	.use(
+		createBem({
+			hyphenate: true,
+		}),
+	)
 	.mount("#app");
