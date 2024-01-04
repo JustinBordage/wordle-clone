@@ -13,10 +13,12 @@
 			letter: string;
 			tileIndex?: number;
 			doFastFlip?: boolean;
+			isWinningRow?: boolean;
 		}>(),
 		{
 			tileIndex: 0,
 			doFastFlip: false,
+			isWinningRow: false,
 		},
 	);
 
@@ -68,7 +70,7 @@
 
 <template>
 	<div
-		:class="$bem({ m: { 'fast-flip': doFastFlip } })"
+		:class="$bem({ m: { 'fast-flip': doFastFlip, 'win': isWinningRow } })"
 		:data-state="shownState"
 		:data-animation="animation"
 		ref="tileRef"
@@ -84,6 +86,7 @@
 	@include anims.PopIn;
 	@include anims.FlipIn;
 	@include anims.FlipOut;
+	@include anims.Bounce;
 
 	.game-tile {
 		$defaultSize: 3.875rem;
@@ -122,6 +125,12 @@
 
 		&[data-state="CORRECT"] {
 			background-color: var(--color-correct);
+		}
+
+		&--win {
+			animation-name: Bounce;
+			animation-duration: 1000ms;
+			animation-delay: calc(v-bind(tileIndex) * 100ms);
 		}
 
 		&[data-animation="pop"] {
