@@ -6,3 +6,5 @@ enum GameStatus {
 }
 
 export default GameStatus;
+
+export type GameOutcome = GameStatus.WIN | GameStatus.LOST;

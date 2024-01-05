@@ -14,6 +14,7 @@
 	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
 	import useGameState from "@/composables/useGameState";
+	import useGameStatistics from "@/composables/useGameStatistics";
 	import useIsValidWord from "@/composables/useIsValidWord";
 	import { validateWordle } from "@/composables/useWordleCheck";
 	import { MAX_GUESSES } from "@/configuration/magic-numbers";
@@ -87,11 +88,19 @@
 			persistGuess(result, currGuess);
 
 			results.value[currRow] = result;
-			gameStatus.value = evalGameStatus(
+			const newGameStatus = evalGameStatus(
 				solution,
 				revealedGuesses,
 				activeRow,
 			);
+
+			// This comes before the "gameStatus" ref is updated so
+			// the change is reflected before the dialog is shown.
+			if (hasGameEnded(newGameStatus)) {
+				saveGameResults(newGameStatus, currRow + 1);
+			}
+
+			gameStatus.value = newGameStatus;
 		}
 	};
 
@@ -151,6 +160,7 @@
 	// ----- Composables -----
 	const isValidWord = useIsValidWord(() => solution.value.length);
 	const { getStoredGameState, persistGuess, resetGame } = useGameState();
+	const { saveGameResults } = useGameStatistics(true);
 
 	// ----- Providers -----
 	provide(DO_FAST_FLIP, doFastFlip);

@@ -1,8 +1,18 @@
 <script setup lang="ts">
+	import { reactive, watch } from "vue";
 	import type { ChartData, ChartOptions } from "chart.js";
 	import { Bar as BarChart } from "vue-chartjs";
 
 	defineOptions({ name: "GuessDistribution" });
+
+	const GUESS_DISTRIBUTION_LABELS: string[] = [
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+	] as const;
 
 	// The "withDefaults" is temporary until I
 	// complete the rest of the statistics behavior.
@@ -10,6 +20,8 @@
 		defineProps<{
 			isCompleted?: boolean;
 			guessIndex?: number;
+			distribution: Record<`${number}`, number>;
+			hasPlayedGame: boolean;
 		}>(),
 		{
 			isCompleted: true,
@@ -46,8 +58,14 @@
 		},
 	} as const;
 
-	const chartData: ChartData<"bar", number[]> = {
-		labels: ["1", "2", "3", "4", "5", "6"],
+	function evalGuessDistributionData(): number[] {
+		return GUESS_DISTRIBUTION_LABELS.map(label => {
+			return props.distribution[label] ?? 0;
+		});
+	}
+
+	const chartData: ChartData<"bar", number[]> = reactive({
+		labels: GUESS_DISTRIBUTION_LABELS,
 		datasets: [
 			{
 				label: "# of Guesses",
@@ -59,29 +77,42 @@
 
 					return "#3a3a3c";
 				},
-				data: [0, 0, 0, 0, 0, 1],
+				data: evalGuessDistributionData(),
 				minBarLength: 26,
 			},
 		],
-	} as const;
+	});
+
+	watch(evalGuessDistributionData, distributionData => {
+		chartData.datasets[0].data = distributionData;
+	});
 </script>
 
 <template>
 	<div :class="$bem({})">
 		<h4 :class="$bem({ e: 'title' })">Guess Distribution</h4>
 		<BarChart
+			v-if="hasPlayedGame"
 			:class="$bem({ e: 'chart' })"
 			:options="chartOptions"
 			:data="chartData"
 		/>
+		<p v-else :class="$bem({ e: 'no-data' })">No game data found!</p>
 	</div>
 </template>
 
 <style lang="scss">
 	.guess-distribution {
+		padding-bottom: 0.75rem;
+
 		&__title {
 			text-align: center;
 			margin: 0.375rem 0;
+		}
+
+		&__no-data {
+			text-align: center;
+			margin: 0;
 		}
 	}
 </style>

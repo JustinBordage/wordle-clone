@@ -1,6 +1,6 @@
+import { type MaybeRef, toValue } from "vue";
 import { MAX_GUESSES } from "@/configuration/magic-numbers";
-import GameStatus from "@/models/enums/GameStatus";
-import { MaybeRef, toValue } from "vue";
+import GameStatus, { type GameOutcome } from "@/models/enums/GameStatus";
 
 function isGameWon(
 	solution: MaybeRef<string>,
@@ -27,6 +27,8 @@ export function evalGameStatus(
 	}
 }
 
-export function hasGameEnded(gameStatus: GameStatus) {
+export function hasGameEnded(
+	gameStatus: GameStatus,
+): gameStatus is GameOutcome {
 	return gameStatus === GameStatus.WIN || gameStatus === GameStatus.LOST;
 }

@@ -4,6 +4,7 @@
 	import Modal from "@/components/common/Modal.vue";
 	import GameStat from "@/components/statistics/GameStat.vue";
 	import GuessDistribution from "@/components/statistics/GuessDistribution.vue";
+	import useGameStatistics from "@/composables/useGameStatistics";
 	import { hasGameEnded } from "@/helpers/game-status";
 	import GameStatus from "@/models/enums/GameStatus";
 
@@ -29,6 +30,15 @@
 		},
 	});
 
+	const winRatio = computed(() => {
+		const { gamesPlayed, gamesLost } = statistics.value;
+		if (gamesPlayed === 0) return 1;
+
+		return (gamesPlayed - gamesLost) / gamesPlayed;
+	});
+
+	const statistics = useGameStatistics();
+
 	watch(
 		() => props.isVisible,
 		isVisible => {
@@ -48,23 +58,44 @@
 
 <template>
 	<Modal :class="$bem({})" v-model:isVisible="visible">
-		<div
-			v-if="gameStatus === GameStatus.LOST"
-			:class="$bem({ e: 'answer' })"
-		>
-			<h4>The Wordle was:</h4>
-			<var :class="$bem({ e: 'solution' })">{{ solution }}</var>
-		</div>
-		<h4 :class="$bem({ e: 'title' })">Statistics</h4>
-		<div :class="$bem({ e: 'wrapper' })">
-			<GameStat label="Games Played" :value="0" />
-			<GameStat label="Win %" :value="0" />
-			<GameStat label="Current Streak" :value="0" />
-			<GameStat label="Max Streak" :value="0" />
-		</div>
-		<GuessDistribution />
-		<div v-if="hasGameEnded(gameStatus)">
-			<Button @click="$emit('playAgain')">Play again!</Button>
+		<div>
+			<div
+				v-if="gameStatus === GameStatus.LOST"
+				:class="$bem({ e: 'answer' })"
+			>
+				<h4>The Wordle was:</h4>
+				<var :class="$bem({ e: 'solution' })">{{ solution }}</var>
+			</div>
+			<h4 :class="$bem({ e: 'title' })">Statistics</h4>
+			<div :class="$bem({ e: 'metrics' })">
+				<GameStat
+					label="Games Played"
+					:value="statistics.gamesPlayed"
+				/>
+				<GameStat
+					label="Win %"
+					:value="winRatio * 100"
+					:wrapLabel="false"
+				/>
+				<GameStat
+					label="Current Streak"
+					:value="statistics.winStreak"
+				/>
+				<GameStat
+					label="Max Streak"
+					:value="statistics.highestWinStreak"
+				/>
+			</div>
+			<GuessDistribution
+				:hasPlayedGame="statistics.gamesPlayed > 0"
+				:distribution="statistics.guessDistribution"
+			/>
+			<div
+				v-if="hasGameEnded(gameStatus)"
+				:class="$bem({ e: 'game-options' })"
+			>
+				<Button @click="$emit('playAgain')">Play again!</Button>
+			</div>
 		</div>
 	</Modal>
 </template>
@@ -76,6 +107,13 @@
 			text-transform: uppercase;
 			margin: 0.375rem 0;
 			text-align: center;
+		}
+
+		&__wrapper {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
 		}
 
 		&__title {
@@ -98,11 +136,18 @@
 			text-align: center;
 		}
 
-		&__wrapper {
+		&__metrics {
 			display: flex;
 			flex-flow: row nowrap;
 			justify-content: center;
 			padding-bottom: 0.375rem;
+			gap: 0.5rem;
+		}
+
+		&__game-options {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
 		}
 	}
 </style>
