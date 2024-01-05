@@ -6,7 +6,6 @@
 		onUnmounted,
 		provide,
 		ref,
-		watch,
 	} from "vue";
 	import GameBoard from "@/components/GameBoard.vue";
 	import GameHeader from "@/components/GameHeader.vue";
@@ -165,11 +164,6 @@
 	// ----- Providers -----
 	provide(DO_FAST_FLIP, doFastFlip);
 
-	// ----- Watchers -----
-	watch(isGameOver, gameIsOver => {
-		if (gameIsOver) showStatistics.value = true;
-	});
-
 	// ----- Lifecycle Methods -----
 	onBeforeMount(async () => {
 		await restoreGameState();
@@ -189,9 +183,11 @@
 			@openStats="showStatistics = true"
 		/>
 		<GameBoard
+			:isGameOver="isGameOver"
 			:solution="solution"
 			:activeRow="activeRow"
 			:guesses="guesses"
+			@openStats="showStatistics = true"
 		/>
 		<GameKeyboard
 			:results="results"
