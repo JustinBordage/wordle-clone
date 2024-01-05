@@ -7,24 +7,25 @@
 		ref,
 		watch,
 	} from "vue";
-	import { computedAsync } from "@vueuse/core";
 	import GameBoard from "@/components/GameBoard.vue";
 	import GameHeader from "@/components/GameHeader.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
 	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
+	import useGameState from "@/composables/useGameState";
 	import useIsValidWord from "@/composables/useIsValidWord";
 	import { validateWordle } from "@/composables/useWordleCheck";
 	import { MAX_GUESSES } from "@/configuration/magic-numbers";
 	import { DO_FAST_FLIP } from "@/configuration/provider-keys";
 	import { evalGameStatus, hasGameEnded } from "@/helpers/game-status";
-	import { generateWordle } from "@/helpers/wordle";
 	import GameStatus from "@/models/enums/GameStatus";
 	import GameTileState from "@/models/enums/GameTileState";
+	import { isNotNull } from "@/utils/validation";
 
 	defineOptions({ name: "WordleGame" });
 
 	// ----- Data -----
+	const solution = ref("");
 	const gameStatus = ref(GameStatus.NOT_STARTED);
 	const results = ref<GameTileState[][]>(Array(MAX_GUESSES));
 	const guesses = ref<string[]>(Array(MAX_GUESSES).fill(""));
@@ -42,7 +43,6 @@
 	const doFastFlip = ref(true);
 
 	// ----- Computed -----
-	const solution = computedAsync(generateWordle, "");
 	const activeRow = computed(
 		() => results.value.filter(result => !!result).length,
 	);
@@ -81,7 +81,11 @@
 		if (currRow < MAX_GUESSES) {
 			disabled.value = true;
 			doFastFlip.value = false;
-			results.value[currRow] = validateWordle(solution.value, currGuess);
+
+			const result = validateWordle(solution.value, currGuess);
+			persistGuess(result, currGuess);
+
+			results.value[currRow] = result;
 			gameStatus.value = evalGameStatus(
 				solution,
 				revealedGuesses,
@@ -115,8 +119,24 @@
 		if (!altKey && !ctrlKey) pressKey(key);
 	}
 
+	function restoreGameArray<T extends GameTileState[] | string>(items: T[]) {
+		return Array(MAX_GUESSES).splice(0, items.length, ...items);
+	}
+
+	async function restoreGameState() {
+		const gameState = await getStoredGameState();
+		solution.value = gameState.solution;
+
+		const restoredResults = gameState.results.filter(isNotNull);
+		results.value = restoreGameArray(restoredResults);
+		guesses.value = restoreGameArray(gameState.guesses).fill("");
+
+		gameStatus.value = evalGameStatus(solution, revealedGuesses, activeRow);
+	}
+
 	// ----- Composables -----
 	const isValidWord = useIsValidWord(() => solution.value.length);
+	const { getStoredGameState, persistGuess } = useGameState();
 
 	// ----- Providers -----
 	provide(DO_FAST_FLIP, doFastFlip);
@@ -127,7 +147,9 @@
 	});
 
 	// ----- Lifecycle Methods -----
-	onBeforeMount(() => {
+	onBeforeMount(async () => {
+		await restoreGameState();
+
 		document.addEventListener("keydown", onBeforeInput);
 	});
 
