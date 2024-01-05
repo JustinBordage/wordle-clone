@@ -1,4 +1,5 @@
 <script setup lang="ts">
+	import GameSettingsDialog from "@/components/settings/GameSettingsDialog.vue";
 	import {
 		computed,
 		nextTick,
@@ -31,8 +32,9 @@
 	const results = ref<GameTileState[][]>(Array(MAX_GUESSES));
 	const guesses = ref<string[]>(Array(MAX_GUESSES).fill(""));
 
-	const showStatistics = ref(false);
 	const showGameRules = ref(false);
+	const showStatistics = ref(false);
+	const showSettings = ref(false);
 	// This will be used to disable the inputs
 	// while the "flip" animation is running.
 	const disabled = ref(false);
@@ -181,6 +183,7 @@
 		<GameHeader
 			@openRules="showGameRules = true"
 			@openStats="showStatistics = true"
+			@openSettings="showSettings = true"
 		/>
 		<GameBoard
 			:isGameOver="isGameOver"
@@ -201,6 +204,7 @@
 			:gameStatus="gameStatus"
 			@playAgain="playAgain"
 		/>
+		<GameSettingsDialog v-model:isVisible="showSettings" />
 	</div>
 </template>
 
