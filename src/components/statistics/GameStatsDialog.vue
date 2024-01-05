@@ -58,7 +58,7 @@
 
 <template>
 	<Modal :class="$bem({})" v-model:isVisible="visible">
-		<div>
+		<div :class="$bem({ e: 'wrapper' })">
 			<div
 				v-if="gameStatus === GameStatus.LOST"
 				:class="$bem({ e: 'answer' })"
