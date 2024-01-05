@@ -1,6 +1,5 @@
 <script setup lang="ts">
 	import { Icon } from "@iconify/vue";
-	import Button from "primevue/button";
 
 	defineOptions({ name: "GameHeader" });
 
@@ -13,22 +12,22 @@
 
 <template>
 	<header :class="$bem({})">
-		<span :class="$bem({ e: 'control-set' })" @click="$emit('openRules')">
-			<Button :class="$bem({ e: 'control' })">
+		<span :class="$bem({ e: 'control-set' })">
+			<button :class="$bem({ e: 'control' })" @click="$emit('openRules')">
 				<Icon icon="mdi:help-circle" />
-			</Button>
+			</button>
 		</span>
 		<h1 :class="$bem({ e: 'title' })">WORDLE</h1>
 		<span :class="$bem({ e: 'control-set' })">
-			<Button :class="$bem({ e: 'control' })" @click="$emit('openStats')">
+			<button :class="$bem({ e: 'control' })" @click="$emit('openStats')">
 				<Icon icon="mdi:poll" />
-			</Button>
-			<Button
+			</button>
+			<button
 				:class="$bem({ e: 'control' })"
 				@click="$emit('openSettings')"
 			>
 				<Icon icon="mdi:cog" />
-			</Button>
+			</button>
 		</span>
 	</header>
 </template>
@@ -62,6 +61,7 @@
 			font-size: 1.5rem;
 			color: var(--color-tone-3);
 			background-color: transparent;
+			appearance: none;
 		}
 
 		&__title {
