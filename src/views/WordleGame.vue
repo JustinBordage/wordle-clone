@@ -1,6 +1,7 @@
 <script setup lang="ts">
 	import {
 		computed,
+		nextTick,
 		onBeforeMount,
 		onUnmounted,
 		provide,
@@ -134,9 +135,17 @@
 		gameStatus.value = evalGameStatus(solution, revealedGuesses, activeRow);
 	}
 
+	async function playAgain() {
+		showStatistics.value = false;
+		await nextTick();
+
+		await resetGame();
+		await restoreGameState();
+	}
+
 	// ----- Composables -----
 	const isValidWord = useIsValidWord(() => solution.value.length);
-	const { getStoredGameState, persistGuess } = useGameState();
+	const { getStoredGameState, persistGuess, resetGame } = useGameState();
 
 	// ----- Providers -----
 	provide(DO_FAST_FLIP, doFastFlip);
@@ -178,7 +187,8 @@
 		<GameStatsDialog
 			v-model:isVisible="showStatistics"
 			:solution="solution"
-			:isGameLost="gameStatus === GameStatus.LOST"
+			:gameStatus="gameStatus"
+			@playAgain="playAgain"
 		/>
 	</div>
 </template>

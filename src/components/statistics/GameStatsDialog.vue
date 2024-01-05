@@ -1,17 +1,21 @@
 <script setup lang="ts">
 	import { computed, nextTick, watch } from "vue";
+	import Button from "primevue/button";
 	import Modal from "@/components/common/Modal.vue";
 	import GameStat from "@/components/statistics/GameStat.vue";
 	import GuessDistribution from "@/components/statistics/GuessDistribution.vue";
+	import { hasGameEnded } from "@/helpers/game-status";
+	import GameStatus from "@/models/enums/GameStatus";
 
 	defineOptions({ name: "GameStatsDialog" });
 
 	const emit = defineEmits<{
 		(e: "update:isVisible", value: boolean);
+		(e: "playAgain");
 	}>();
 
 	const props = defineProps<{
-		isGameLost: boolean;
+		gameStatus: GameStatus;
 		solution: string;
 		isVisible: boolean;
 	}>();
@@ -44,7 +48,10 @@
 
 <template>
 	<Modal :class="$bem({})" v-model:isVisible="visible">
-		<div v-if="isGameLost" :class="$bem({ e: 'answer' })">
+		<div
+			v-if="gameStatus === GameStatus.LOST"
+			:class="$bem({ e: 'answer' })"
+		>
 			<h4>The Wordle was:</h4>
 			<var :class="$bem({ e: 'solution' })">{{ solution }}</var>
 		</div>
@@ -56,6 +63,9 @@
 			<GameStat label="Max Streak" :value="0" />
 		</div>
 		<GuessDistribution />
+		<div v-if="hasGameEnded(gameStatus)">
+			<Button @click="$emit('playAgain')">Play again!</Button>
+		</div>
 	</Modal>
 </template>
 
