@@ -1,5 +1,4 @@
 <script setup lang="ts">
-	import GameSettingsDialog from "@/components/settings/GameSettingsDialog.vue";
 	import {
 		computed,
 		nextTick,
@@ -13,12 +12,16 @@
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
 	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
 	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
+	import GameSettingsDialog from "@/components/settings/GameSettingsDialog.vue";
 	import useGameState from "@/composables/useGameState";
 	import useGameStatistics from "@/composables/useGameStatistics";
 	import useIsValidWord from "@/composables/useIsValidWord";
 	import { validateWordle } from "@/composables/useWordleCheck";
 	import { MAX_GUESSES } from "@/configuration/magic-numbers";
-	import { DO_FAST_FLIP } from "@/configuration/provider-keys";
+	import {
+		DO_FAST_FLIP,
+		HARD_MODE_ENABLED,
+	} from "@/configuration/provider-keys";
 	import { evalGameStatus, hasGameEnded } from "@/helpers/game-status";
 	import GameStatus from "@/models/enums/GameStatus";
 	import GameTileState from "@/models/enums/GameTileState";
@@ -160,10 +163,12 @@
 
 	// ----- Composables -----
 	const isValidWord = useIsValidWord(() => solution.value.length);
-	const { getStoredGameState, persistGuess, resetGame } = useGameState();
+	const { hardMode, getStoredGameState, persistGuess, resetGame } =
+		useGameState();
 	const { saveGameResults } = useGameStatistics(true);
 
 	// ----- Providers -----
+	provide(HARD_MODE_ENABLED, hardMode);
 	provide(DO_FAST_FLIP, doFastFlip);
 
 	// ----- Lifecycle Methods -----

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-	import { computed, ref } from "vue";
+	import { computed, inject, ref } from "vue";
 	import Modal from "@/components/common/Modal.vue";
 	import GameSettingToggle from "./GameSettingToggle.vue";
+	import { HARD_MODE_ENABLED } from "@/configuration/provider-keys";
 
 	defineOptions({ name: "GameSettingsDialog" });
 
-	const isHardMode = ref(false);
+	const hardMode = inject(HARD_MODE_ENABLED, false);
 	const isDarkMode = ref(true);
 	const isColorBlindMode = ref(false);
 
@@ -23,15 +24,6 @@
 		},
 		set(newVisible: boolean) {
 			emit("update:isVisible", newVisible);
-		},
-	});
-
-	const hardMode = computed({
-		get(): boolean {
-			return isHardMode.value;
-		},
-		set(hardMode: boolean) {
-			isHardMode.value = hardMode;
 		},
 	});
 </script>

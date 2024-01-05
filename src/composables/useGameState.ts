@@ -1,6 +1,8 @@
+import { computed } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import { MAX_GUESSES } from "@/configuration/magic-numbers";
 import { generateWordle } from "@/helpers/wordle";
+import { hasGameStarted } from "@/helpers/wordle-validation";
 import { RevealedState } from "@/models/enums/GameTileState";
 import { b64Decode, b64Encode } from "@/utils/base64";
 import { deepClone } from "@/utils/cloning";
@@ -26,6 +28,24 @@ export default function useGameState() {
 					solution: obfuscateSolution(solution),
 				});
 			},
+		},
+	});
+
+	const hardMode = computed({
+		get(): boolean {
+			return gameState.value.hardMode;
+		},
+		set(isHardMode: boolean) {
+			if (!hasGameStarted(gameState.value.guesses)) {
+				gameState.value = {
+					...gameState.value,
+					hardMode: isHardMode,
+				};
+			} else if (import.meta.env.DEV) {
+				console.warn(
+					"Cannot toggle hard mode after the game has already started!",
+				);
+			}
 		},
 	});
 
@@ -56,11 +76,11 @@ export default function useGameState() {
 
 	async function resetGame() {
 		const solution = await generateWordle();
-		const isHardMode = gameState.value.hardMode;
-		gameState.value = initialGameStateSupplier(solution, isHardMode);
+		gameState.value = initialGameStateSupplier(solution, hardMode.value);
 	}
 
 	return {
+		hardMode,
 		persistGuess,
 		getStoredGameState,
 		resetGame,
