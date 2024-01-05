@@ -28,13 +28,6 @@
 		() => props.solution.length !== props.guess.length,
 	);
 
-	const paddedGuess = computed(() => {
-		const solutionLength = props.solution.length;
-		return props.guess
-			.padEnd(props.solution.length, " ")
-			.slice(0, solutionLength);
-	});
-
 	const tileState = computed(() => {
 		const wordle = props.solution;
 		const guess = props.guess;
@@ -67,7 +60,7 @@
 			v-for="(id, index) in tileIds"
 			:key="id"
 			:doFastFlip="doFastFlip"
-			:letter="paddedGuess[index]"
+			:letter="guess?.[index] ?? ' '"
 			:state="tileState[index]!!"
 			:tileIndex="index"
 		/>
