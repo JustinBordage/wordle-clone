@@ -8,10 +8,16 @@
 		(e: "update:isVisible", value: boolean);
 	}>();
 
-	const props = defineProps<{
-		title?: string;
-		isVisible: boolean;
-	}>();
+	const props = withDefaults(
+		defineProps<{
+			isVisible: boolean;
+			title?: string;
+			centered?: boolean;
+		}>(),
+		{
+			centered: false,
+		},
+	);
 
 	const visible = computed({
 		get() {
@@ -31,7 +37,9 @@
 		v-model:visible="visible"
 	>
 		<template v-if="title" #header>
-			<h2 :class="$bem({ e: 'title' })">{{ title }}</h2>
+			<h2 :class="$bem({ e: 'title', m: { centered } })">
+				{{ title }}
+			</h2>
 		</template>
 		<slot />
 	</Dialog>
@@ -50,6 +58,11 @@
 
 		&__title {
 			margin: 0;
+
+			&--centered {
+				width: 100%;
+				text-align: center;
+			}
 		}
 
 		& .p-dialog {
