@@ -121,7 +121,9 @@
 	}
 
 	function restoreGameArray<T extends GameTileState[] | string>(items: T[]) {
-		return Array(MAX_GUESSES).splice(0, items.length, ...items);
+		const gameData = Array(MAX_GUESSES);
+		gameData.splice(0, items.length, ...items);
+		return gameData;
 	}
 
 	async function restoreGameState() {
@@ -130,7 +132,10 @@
 
 		const restoredResults = gameState.results.filter(isNotNull);
 		results.value = restoreGameArray(restoredResults);
-		guesses.value = restoreGameArray(gameState.guesses).fill("");
+		guesses.value = restoreGameArray(gameState.guesses).fill(
+			"",
+			gameState.guesses.length,
+		);
 
 		gameStatus.value = evalGameStatus(solution, revealedGuesses, activeRow);
 	}
