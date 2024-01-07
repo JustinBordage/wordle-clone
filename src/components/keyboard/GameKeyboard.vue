@@ -2,6 +2,7 @@
 	import { computed } from "vue";
 	import { Icon } from "@iconify/vue";
 	import KeyboardKey from "@/components/keyboard/KeyboardKey.vue";
+	import { keepHighestState } from "@/helpers/tile-states";
 	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "GameKeyboard" });
@@ -30,13 +31,7 @@
 					const letter = guessWord.charAt(index);
 					if (letter === "") return;
 
-					const currLetterState = acc[letter];
-					if (
-						getStatePriority(newLetterState) >
-						getStatePriority(currLetterState)
-					) {
-						acc[letter] = newLetterState;
-					}
+					acc[letter] = keepHighestState(newLetterState, acc[letter]);
 				});
 
 				return acc;
@@ -44,19 +39,6 @@
 			{},
 		);
 	});
-
-	function getStatePriority(state: GameTileState) {
-		switch (state) {
-			case GameTileState.ABSENT:
-				return 1;
-			case GameTileState.PRESENT:
-				return 2;
-			case GameTileState.CORRECT:
-				return 3;
-			default:
-				return 0;
-		}
-	}
 </script>
 
 <template>
