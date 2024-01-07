@@ -1,4 +1,5 @@
 <script setup lang="ts">
+	import GenerateWordleDialog from "@/components/generator/GenerateWordleDialog.vue";
 	import {
 		computed,
 		nextTick,
@@ -38,6 +39,7 @@
 	const showGameRules = ref(false);
 	const showStatistics = ref(false);
 	const showSettings = ref(false);
+	const showGenerator = ref(false);
 	// This will be used to disable the inputs
 	// while the "flip" animation is running.
 	const disabled = ref(false);
@@ -187,6 +189,7 @@
 	<div v-if="solution !== ''" :class="$bem({})">
 		<GameHeader
 			@openRules="showGameRules = true"
+			@openGenerator="showGenerator = true"
 			@openStats="showStatistics = true"
 			@openSettings="showSettings = true"
 		/>
@@ -210,6 +213,7 @@
 			@playAgain="playAgain"
 		/>
 		<GameSettingsDialog v-model:isVisible="showSettings" />
+		<GenerateWordleDialog v-model:isVisible="showGenerator" />
 	</div>
 </template>
 

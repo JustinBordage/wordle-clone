@@ -103,7 +103,7 @@
 			}
 
 			&-content {
-				padding-bottom: 0;
+				padding-bottom: 0.25rem;
 			}
 		}
 	}
