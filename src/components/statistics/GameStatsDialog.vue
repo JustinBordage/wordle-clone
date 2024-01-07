@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { computed, nextTick, watch } from "vue";
+	import { computed } from "vue";
 	import Button from "primevue/button";
 	import Modal from "@/components/common/Modal.vue";
 	import GameStat from "@/components/statistics/GameStat.vue";
@@ -38,22 +38,6 @@
 	});
 
 	const statistics = useGameStatistics();
-
-	watch(
-		() => props.isVisible,
-		isVisible => {
-			if (isVisible) {
-				nextTick(() => {
-					const { activeElement } = document;
-					if (
-						activeElement?.matches("button.p-dialog-header-close")
-					) {
-						(activeElement as HTMLButtonElement).blur();
-					}
-				});
-			}
-		},
-	);
 </script>
 
 <template>

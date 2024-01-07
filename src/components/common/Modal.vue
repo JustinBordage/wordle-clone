@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { computed } from "vue";
+	import { computed, nextTick, watch } from "vue";
 	import Dialog from "primevue/dialog";
 
 	defineOptions({ name: "Modal" });
@@ -27,6 +27,22 @@
 			emit("update:isVisible", newVisible);
 		},
 	});
+
+	watch(
+		() => props.isVisible,
+		isVisible => {
+			if (isVisible) {
+				nextTick(() => {
+					const { activeElement } = document;
+					if (
+						activeElement?.matches("button.p-dialog-header-close")
+					) {
+						(activeElement as HTMLButtonElement).blur();
+					}
+				});
+			}
+		},
+	);
 </script>
 
 <template>
