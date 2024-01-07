@@ -1,4 +1,7 @@
 :root {
+	font-family: clear sans, helvetica neue, Arial, sans-serif;
+	font-size: 16px;
+
 	// General Colors:
 	--green: #6AAA64;
 	--darkendGreen: #538D4E;
@@ -11,6 +14,28 @@
 	--black: #212121;
 	--orange: #F5793A;
 	--blue: #85C0F9;
+
+	// Lightmode Colors:
+	--color-tone-1: #1A1A1B;
+	--color-tone-2: #787C7E;
+	--color-tone-3: #878A8C;
+	--color-tone-4: #D3D6DA;
+	--color-tone-5: #EDEFF1;
+	--color-tone-6: #F6F7F8;
+	--color-tone-7: #FFF;
+	--opacity-50: rgba(255, 255, 255, 0.5);
+
+	--color-present: var(--yellow);
+	--color-correct: var(--green);
+	--color-absent: var(--color-tone-2);
+	--tile-text-color: var(--color-tone-7);
+	--key-text-color: var(--color-tone-1);
+	--key-evaluated-text-color: var(--color-tone-7);
+	--key-bg: var(--color-tone-4);
+	--key-bg-present: var(--color-present);
+	--key-bg-correct: var(--color-correct);
+	--key-bg-absent: var(--color-absent);
+	--modal-content-bg: var(--color-tone-7);
 }
 
 :root:has(.nightmode) {
@@ -21,11 +46,12 @@
 	--color-tone-5: #272729;
 	--color-tone-6: #1A1A1B;
 	--color-tone-7: #121213;
+	--opacity-50: rgba(0, 0, 0, 0.5);
 
-	--tile-text-color: var(--color-tone-1);
-	--color-absent: var(--color-tone-4);
 	--color-present: var(--darkendYellow);
 	--color-correct: var(--darkendGreen);
+	--color-absent: var(--color-tone-4);
+	--tile-text-color: var(--color-tone-1);
 	--key-text-color: var(--color-tone-1);
 	--key-evaluated-text-color: var(--color-tone-1);
 	--key-bg: var(--color-tone-2);
@@ -33,4 +59,13 @@
 	--key-bg-correct: var(--color-correct);
 	--key-bg-absent: var(--color-absent);
 	--modal-content-bg: var(--color-tone-7);
+}
+
+:root:has(.colorblind) {
+	--color-correct: var(--orange);
+	--color-present: var(--blue);
+	--tile-text-color: var(--white);
+	--key-bg-present: var(--color-present);
+	--key-bg-correct: var(--color-correct);
+	--key-bg-absent: var(--color-absent);
 }
