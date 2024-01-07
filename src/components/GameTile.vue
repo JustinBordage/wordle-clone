@@ -114,7 +114,7 @@
 		}
 
 		&[data-state="TBD"] {
-			background-color: var(--color-tone-7);
+			backdrop-filter: brightness(0.9);
 			border-color: var(--color-tone-3);
 			color: var(--color-tone-1);
 		}
