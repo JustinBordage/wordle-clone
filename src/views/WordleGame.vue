@@ -24,7 +24,7 @@
 	} from "@/configuration/provider-keys";
 	import { evalGameStatus, hasGameEnded } from "@/helpers/game-status";
 	import GameStatus from "@/models/enums/GameStatus";
-	import GameTileState from "@/models/enums/GameTileState";
+	import GameTileState, { RevealedState } from "@/models/enums/GameTileState";
 	import { isNotNull } from "@/utils/validation";
 
 	defineOptions({ name: "WordleGame" });
@@ -32,7 +32,7 @@
 	// ----- Data -----
 	const solution = ref("");
 	const gameStatus = ref(GameStatus.NOT_STARTED);
-	const results = ref<GameTileState[][]>(Array(MAX_GUESSES));
+	const results = ref<RevealedState[][]>(Array(MAX_GUESSES));
 	const guesses = ref<string[]>(Array(MAX_GUESSES).fill(""));
 
 	const showGameRules = ref(false);

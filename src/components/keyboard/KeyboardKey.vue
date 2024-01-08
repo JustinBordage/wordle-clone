@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	import { computed } from "vue";
-	import GameTileState from "@/models/enums/GameTileState";
+	import { RevealedState } from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "KeyboardKey" });
 
@@ -10,7 +10,7 @@
 
 	const props = defineProps<{
 		value: string;
-		state?: GameTileState;
+		state?: RevealedState;
 	}>();
 
 	const isOneAndAHalf = computed(() => props.value.length > 1);

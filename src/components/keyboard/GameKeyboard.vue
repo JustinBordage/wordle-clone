@@ -3,7 +3,7 @@
 	import { Icon } from "@iconify/vue";
 	import KeyboardKey from "@/components/keyboard/KeyboardKey.vue";
 	import { keepHighestState } from "@/helpers/tile-states";
-	import GameTileState from "@/models/enums/GameTileState";
+	import { RevealedState } from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "GameKeyboard" });
 
@@ -12,7 +12,7 @@
 	}>();
 
 	const props = defineProps<{
-		results: GameTileState[][];
+		results: RevealedState[][];
 		revealedGuesses: string[];
 	}>();
 
@@ -23,7 +23,7 @@
 	] as const;
 
 	const letterStates = computed(() => {
-		return props.results.reduce<Record<string, GameTileState>>(
+		return props.results.reduce<Record<string, RevealedState>>(
 			(acc, resultRow, index) => {
 				const guessWord = props.revealedGuesses[index] ?? "";
 
