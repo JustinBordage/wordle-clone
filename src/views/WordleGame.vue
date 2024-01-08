@@ -7,6 +7,7 @@
 		provide,
 		ref,
 	} from "vue";
+	import { useThrottleFn } from "@vueuse/core";
 	import GameBoard from "@/components/GameBoard.vue";
 	import GameHeader from "@/components/GameHeader.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
@@ -72,7 +73,7 @@
 	});
 
 	// ----- Methods -----
-	const submitWord = () => {
+	const submitWord = useThrottleFn(() => {
 		const currGuess = guess.value;
 		if (solution.value.length !== currGuess.length) return;
 
@@ -120,7 +121,7 @@
 
 			gameStatus.value = newGameStatus;
 		}
-	};
+	}, 250);
 
 	const VALID_KEYS = /[A-Za-z]/;
 
