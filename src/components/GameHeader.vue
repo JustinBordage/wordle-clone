@@ -13,17 +13,26 @@
 <template>
 	<header :class="$bem({})">
 		<span :class="$bem({ e: 'control-set' })">
-			<button :class="$bem({ e: 'control' })" @click="$emit('openRules')">
+			<button
+				:class="$bem({ e: 'control' })"
+				aria-label="Game Rules"
+				@click="$emit('openRules')"
+			>
 				<Icon icon="mdi:help-circle" />
 			</button>
 		</span>
 		<h1 :class="$bem({ e: 'title' })">WORDLE</h1>
 		<span :class="$bem({ e: 'control-set' })">
-			<button :class="$bem({ e: 'control' })" @click="$emit('openStats')">
+			<button
+				:class="$bem({ e: 'control' })"
+				aria-label="Game Stats"
+				@click="$emit('openStats')"
+			>
 				<Icon icon="mdi:poll" />
 			</button>
 			<button
 				:class="$bem({ e: 'control' })"
+				aria-label="Game Settings"
 				@click="$emit('openSettings')"
 			>
 				<Icon icon="mdi:cog" />

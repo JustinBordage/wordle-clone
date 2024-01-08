@@ -103,6 +103,7 @@
 		line-height: 2rem;
 		font-weight: bold;
 		text-transform: uppercase;
+		color: var(--tile-text-color);
 
 		&[data-state="EMPTY"],
 		&[data-state="TBD"] {

@@ -78,7 +78,9 @@
 				v-if="hasGameEnded(gameStatus)"
 				:class="$bem({ e: 'game-options' })"
 			>
-				<Button @click="$emit('playAgain')">Play again!</Button>
+				<Button aria-label="Play Again" @click="$emit('playAgain')">
+					Play again!
+				</Button>
 			</div>
 		</div>
 	</Modal>

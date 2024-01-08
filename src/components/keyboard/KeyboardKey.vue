@@ -18,7 +18,15 @@
 
 <template>
 	<button
-		:class="$bem({ m: { 'one-and-a-half': isOneAndAHalf } })"
+		:class="
+			$bem({
+				m: {
+					'one-and-a-half': isOneAndAHalf,
+					'evaluated': state !== undefined,
+				},
+			})
+		"
+		:aria-label="value"
 		:data-state="state"
 		@click="$emit('pressKey', value)"
 	>
@@ -48,6 +56,10 @@
 		background-color: var(--key-bg);
 		color: var(--key-text-color);
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
+
+		&--evaluated {
+			color: var(--key-evaluated-text-color);
+		}
 
 		&--one-and-a-half {
 			width: $keyWidth * 1.5;
