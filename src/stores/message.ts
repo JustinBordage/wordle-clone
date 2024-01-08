@@ -55,7 +55,7 @@ export const useMessageStore = defineStore("message", () => {
 
 	/** Sets the game win based on how many guesses it took the user. */
 	function showWinMessage(numOfGuesses: number) {
-		let message = "";
+		let message: string;
 
 		switch (numOfGuesses) {
 			case 1:
@@ -79,12 +79,17 @@ export const useMessageStore = defineStore("message", () => {
 				break;
 		}
 
-		setMessage(GameMessageType.SUCCESS, message);
+		setMessage(GameMessageType.SUCCESS, message, false);
+	}
+
+	function showGameStartMessage() {
+		setMessage(GameMessageType.INFO, "Guess the first word!", false);
 	}
 
 	return {
 		message,
 		setMessage,
 		showWinMessage,
+		showGameStartMessage,
 	};
 });

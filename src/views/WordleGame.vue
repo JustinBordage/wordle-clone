@@ -25,6 +25,7 @@
 		HARD_MODE_ENABLED,
 	} from "@/configuration/provider-keys";
 	import { evalGameStatus, hasGameEnded } from "@/helpers/game-status";
+	import { hasGameStarted } from "@/helpers/wordle-validation";
 	import { GameMessageType } from "@/models/enums/GameMessageType";
 	import GameStatus from "@/models/enums/GameStatus";
 	import GameTileState, { RevealedState } from "@/models/enums/GameTileState";
@@ -174,6 +175,7 @@
 
 		await resetGame();
 		await restoreGameState();
+		messageStore.showGameStartMessage();
 	}
 
 	// ----- Composables -----
@@ -189,6 +191,10 @@
 	// ----- Lifecycle Methods -----
 	onBeforeMount(async () => {
 		await restoreGameState();
+
+		if (!hasGameStarted(revealedGuesses.value, solution.value.length)) {
+			messageStore.showGameStartMessage();
+		}
 
 		document.addEventListener("keydown", onBeforeInput);
 	});
