@@ -10,9 +10,10 @@
 	import GameBoard from "@/components/GameBoard.vue";
 	import GameHeader from "@/components/GameHeader.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
+	import GameMessageManager from "@/components/messages/GameMessageManager.vue";
 	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
-	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
 	import GameSettingsDialog from "@/components/settings/GameSettingsDialog.vue";
+	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
 	import useGameState from "@/composables/useGameState";
 	import useGameStatistics from "@/composables/useGameStatistics";
 	import useIsValidWord from "@/composables/useIsValidWord";
@@ -23,8 +24,10 @@
 		HARD_MODE_ENABLED,
 	} from "@/configuration/provider-keys";
 	import { evalGameStatus, hasGameEnded } from "@/helpers/game-status";
+	import { GameMessageType } from "@/models/enums/GameMessageType";
 	import GameStatus from "@/models/enums/GameStatus";
 	import GameTileState, { RevealedState } from "@/models/enums/GameTileState";
+	import { useMessageStore } from "@/stores/message";
 	import { isNotNull } from "@/utils/validation";
 
 	defineOptions({ name: "WordleGame" });
@@ -47,6 +50,8 @@
 	 *  @remark This is a bit of a hacky solution,
 	 *   so I may refactor it later. */
 	const doFastFlip = ref(true);
+
+	const messageStore = useMessageStore();
 
 	// ----- Computed -----
 	const activeRow = computed(
@@ -72,14 +77,18 @@
 		if (solution.value.length !== currGuess.length) return;
 
 		if (!isValidWord(currGuess)) {
-			// TODO: Replace this with something less intrusive
-			alert("This word is not valid!");
+			messageStore.setMessage(
+				GameMessageType.WARNING,
+				"This word is not valid!",
+			);
 			return;
 		}
 
 		if (revealedGuesses.value.includes(currGuess)) {
-			// TODO: Replace this with something less intrusive
-			alert("This word has already been used!");
+			messageStore.setMessage(
+				GameMessageType.WARNING,
+				"This word has already been used!",
+			);
 			return;
 		}
 
@@ -101,7 +110,12 @@
 			// This comes before the "gameStatus" ref is updated so
 			// the change is reflected before the dialog is shown.
 			if (hasGameEnded(newGameStatus)) {
-				saveGameResults(newGameStatus, currRow + 1);
+				const numOfGuesses = currRow + 1;
+				saveGameResults(newGameStatus, numOfGuesses);
+
+				if (newGameStatus === GameStatus.WIN) {
+					messageStore.showWinMessage(numOfGuesses);
+				}
 			}
 
 			gameStatus.value = newGameStatus;
@@ -190,6 +204,7 @@
 			@openStats="showStatistics = true"
 			@openSettings="showSettings = true"
 		/>
+		<GameMessageManager />
 		<GameBoard
 			:isGameOver="isGameOver"
 			:solution="solution"
