@@ -5,7 +5,7 @@ import {
 } from "obscenity";
 import { getWordsList } from "@/adapters/wordle";
 import { WORDLE_LENGTH } from "@/configuration/magic-numbers";
-import { pickRandomWord } from "@/utils/RandomUtils";
+import { pickRandomWord } from "@/utils/random";
 
 function getProfanityChecker(): RegExpMatcher {
 	return new RegExpMatcher({
