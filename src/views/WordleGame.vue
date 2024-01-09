@@ -14,13 +14,12 @@
 	// ----- Data -----
 	const isLoading = ref(true);
 	const currGuess = ref("");
-
 	const showGameRules = ref(false);
 	const showStatistics = ref(false);
 	const showSettings = ref(false);
-	// This will be used to disable the inputs
-	// while the "flip" animation is running.
-	const disabled = ref(false);
+	/** Used to prevent inputs while the
+	 *  tile flip animation is running. */
+	const preventKeyInput = ref(false);
 
 	const wordleStore = useWordleStore();
 
@@ -28,7 +27,7 @@
 	const VALID_KEYS = /[A-Za-z]/;
 
 	async function pressKey(key: string) {
-		if (wordleStore.isGameOver || disabled.value) return;
+		if (wordleStore.isGameOver || preventKeyInput.value) return;
 
 		switch (key) {
 			case "Backspace":
@@ -39,6 +38,7 @@
 					currGuess.value,
 				);
 				if (isSuccessful) {
+					preventKeyInput.value = true;
 					currGuess.value = "";
 				}
 				break;
@@ -59,6 +59,7 @@
 	}
 
 	function onRevealEnd() {
+		preventKeyInput.value = false;
 		if (wordleStore.isGameOver) {
 			showStatistics.value = true;
 		}
