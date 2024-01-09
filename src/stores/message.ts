@@ -86,10 +86,17 @@ export const useMessageStore = defineStore("message", () => {
 		setMessage(GameMessageType.INFO, "Guess the first word!", false);
 	}
 
+	function clearGameStartMessage() {
+		if (_state.msg?.text === "Guess the first word!") {
+			_state.msg = null;
+		}
+	}
+
 	return {
 		message,
 		setMessage,
 		showWinMessage,
 		showGameStartMessage,
+		clearGameStartMessage,
 	};
 });

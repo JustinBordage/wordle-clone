@@ -3,6 +3,7 @@
 	import WordRow from "@/components/WordRow.vue";
 	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
 	import { MAX_GUESSES } from "@/configuration/magic-numbers";
+	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "GameBoard" });
 
@@ -11,11 +12,11 @@
 	}>();
 
 	const props = defineProps<{
-		isGameOver: boolean;
-		solution: string;
-		guesses: string[];
-		activeRow: number;
+		currGuess: string;
 	}>();
+
+	// ----- Stores -----
+	const wordleStore = useWordleStore();
 
 	// ----- Data -----
 	const gameBoard = ref<HTMLDivElement | null>(null);
@@ -56,14 +57,22 @@
 		}
 	}
 
+	function getRowGuess(index: number) {
+		if (index !== wordleStore.activeRowIndex) {
+			return wordleStore.guesses[index] ?? "";
+		} else {
+			return props.currGuess;
+		}
+	}
+
 	// ----- Watchers -----
-	watch(() => props.isGameOver, handleGameOver);
+	watch(() => wordleStore.isGameOver, handleGameOver);
 
 	// ----- Composables -----
 	const rowIds = useIdSetGenerator(() => MAX_GUESSES);
 
 	// ----- Lifecycle Methods -----
-	onMounted(() => handleGameOver(props.isGameOver));
+	onMounted(() => handleGameOver(wordleStore.isGameOver));
 </script>
 
 <template>
@@ -71,10 +80,8 @@
 		<WordRow
 			v-for="(id, index) in rowIds"
 			:key="id"
-			:solution="solution"
-			:isRevealed="activeRow > index"
-			:isActiveRow="activeRow === index"
-			:guess="guesses[index] ?? ''"
+			:guess="getRowGuess(index)"
+			:rowIndex="index"
 		/>
 	</div>
 </template>

@@ -1,53 +1,55 @@
 <script setup lang="ts">
-	import { computed, inject, onUnmounted, ref } from "vue";
+	import { computed, onUnmounted, ref } from "vue";
 	import GameTile from "@/components/GameTile.vue";
 	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
 	import useKeyHold from "@/composables/useKeyHold";
 	import { useShakeElement } from "@/composables/useShakeElement";
-	import { validateWordle } from "@/composables/useWordleCheck";
-	import { DO_FAST_FLIP } from "@/configuration/provider-keys";
 	import GameTileState from "@/models/enums/GameTileState";
+	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "WordRow" });
 
 	const props = defineProps<{
-		solution: string;
+		rowIndex: number;
 		guess: string;
-		isRevealed: boolean;
-		isActiveRow: boolean;
 	}>();
 
-	// ----- Injects -----
-	const doFastFlip = inject(DO_FAST_FLIP, false);
+	const wordleStore = useWordleStore();
 
 	// ----- Data -----
 	const row = ref<HTMLDivElement | null>(null);
 
 	// ----- Computed -----
+	const isActiveRow = computed(
+		() => wordleStore.activeRowIndex === props.rowIndex,
+	);
 	const isIncomplete = computed(
-		() => props.solution.length !== props.guess.length,
+		() => wordleStore.solution.length !== props.guess.length,
+	);
+	const doFastFlip = computed(
+		() => props.rowIndex < wordleStore.restoredRows,
 	);
 
-	const tileState = computed(() => {
-		const wordle = props.solution;
-		const guess = props.guess;
+	const tileStates = computed(() => {
+		const { solution, results } = wordleStore;
+		const { guess, rowIndex } = props;
 
-		if (!props.isRevealed) {
-			return Array(wordle.length)
+		if (results.length <= rowIndex) {
+			return Array(solution.length)
 				.fill(GameTileState.TBD, 0, guess.length)
 				.fill(GameTileState.EMPTY, guess.length);
 		} else {
-			return validateWordle(wordle, guess);
+			return results[rowIndex];
 		}
 	});
 
 	// ----- Composables -----
-	const tileIds = useIdSetGenerator(() => props.solution.length);
+	const tileIds = useIdSetGenerator(() => wordleStore.solution.length);
 
 	const { isHeld, stop } = useKeyHold("Enter");
 	useShakeElement(
 		row,
-		() => props.isActiveRow && isHeld.value && isIncomplete.value,
+		() => isActiveRow.value && isHeld.value && isIncomplete.value,
 	);
 
 	// ----- Lifecycle Methods -----
@@ -61,7 +63,7 @@
 			:key="id"
 			:doFastFlip="doFastFlip"
 			:letter="guess?.[index] ?? ' '"
-			:state="tileState[index]!!"
+			:state="tileStates[index]!!"
 			:tileIndex="index"
 		/>
 	</div>
