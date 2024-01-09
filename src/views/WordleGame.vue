@@ -58,6 +58,12 @@
 		if (!altKey && !ctrlKey) pressKey(key);
 	}
 
+	function onRevealEnd() {
+		if (wordleStore.isGameOver) {
+			showStatistics.value = true;
+		}
+	}
+
 	// ----- Lifecycle Methods -----
 	onBeforeMount(async () => {
 		await wordleStore.initialize();
@@ -79,7 +85,7 @@
 			@openSettings="showSettings = true"
 		/>
 		<GameMessageManager />
-		<GameBoard :currGuess="currGuess" @openStats="showStatistics = true" />
+		<GameBoard :currGuess="currGuess" @revealComplete="onRevealEnd" />
 		<GameKeyboard @pressKey="pressKey" />
 		<!-- Game Dialogs/Modals -->
 		<GameRulesDialog v-model:isVisible="showGameRules" />

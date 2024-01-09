@@ -1,17 +1,17 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
+import { useThrottleFn } from "@vueuse/core";
 import useGameState from "./composables/useGameState";
+import useHardMode from "./composables/useHardMode";
 import useIsValidWord from "./composables/useIsValidWord";
 import { MAX_GUESSES } from "@/configuration/magic-numbers";
+import { evalGameStatus, hasGameEnded } from "./helpers/game-status";
 import { generateWordle } from "@/helpers/wordle";
+import { validateRow } from "./helpers/validation";
 import { GameMessageType } from "@/models/enums/GameMessageType";
 import GameStatus from "@/models/enums/GameStatus";
 import { useMessageStore } from "@/stores/message";
 import { useStatisticsStore } from "@/stores/statistics";
-import { evalGameStatus, hasGameEnded } from "./helpers/game-status";
-import { validateRow } from "./helpers/validation";
-import useHardMode from "./composables/useHardMode";
-import { useThrottleFn } from "@vueuse/core";
 
 const usePrivateWordleStore = defineStore("privateWordle", {
 	state: () => ({
@@ -27,6 +27,7 @@ export const useWordleStore = defineStore("wordle", () => {
 
 	// ----- State -----
 	const privateState = usePrivateWordleStore();
+	const winningRowIndex = ref<number | null>(null);
 	const restoredRows = ref(0);
 
 	// ----- Getters -----
@@ -81,6 +82,10 @@ export const useWordleStore = defineStore("wordle", () => {
 
 		if (hasGameEnded(newGameStatus)) {
 			statisticsStore.saveGameResults(newGameStatus, currRow + 1);
+
+			if (newGameStatus === GameStatus.WIN) {
+				winningRowIndex.value = currRow;
+			}
 		}
 		privateState.gameStatus = newGameStatus;
 
@@ -94,6 +99,7 @@ export const useWordleStore = defineStore("wordle", () => {
 		setSolution(await generateWordle());
 		messageStore.showGameStartMessage();
 		privateState.gameStatus = GameStatus.NOT_STARTED;
+		winningRowIndex.value = null;
 		restoredRows.value = 0;
 	}
 
@@ -118,6 +124,7 @@ export const useWordleStore = defineStore("wordle", () => {
 		guesses,
 		results,
 		activeRowIndex,
+		winningRowIndex,
 		hasGameStarted,
 		isGameOver,
 		isHardModeEnabled,
