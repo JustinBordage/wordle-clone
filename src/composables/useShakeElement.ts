@@ -1,8 +1,11 @@
 import { Ref, watch } from "vue";
 import { RefOrGetter } from "@/models/types/vue";
 
-/** Requires a shake animation to be
- *  tied to the ".shake" selector. */
+/** Applies a "shake" class to an
+ *  element when the boolean is true.
+ *
+ *  @remark Requires a shake animation
+ *  to be tied to the ".shake" selector. */
 export function useShakeElement(
 	elementRef: Ref<HTMLElement | null>,
 	isShaking: RefOrGetter<boolean>,
