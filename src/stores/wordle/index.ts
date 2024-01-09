@@ -106,12 +106,19 @@ export const useWordleStore = defineStore("wordle", () => {
 	async function initialize() {
 		await initializeState();
 
-		privateState.gameStatus = evalGameStatus(
+		const gameStatus = evalGameStatus(
 			solution.value,
 			guesses.value,
 			activeRowIndex.value,
 		);
-		restoredRows.value = gameState.value.guesses.length;
+		privateState.gameStatus = gameStatus;
+
+		const numOfGuesses = gameState.value.guesses.length;
+		restoredRows.value = numOfGuesses;
+
+		if (gameStatus === GameStatus.WIN) {
+			winningRowIndex.value = numOfGuesses - 1;
+		}
 
 		if (!hasGameStarted.value) {
 			messageStore.showGameStartMessage();

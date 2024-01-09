@@ -84,8 +84,12 @@
 				v-if="wordleStore.isGameOver"
 				:class="$bem({ e: 'game-options' })"
 			>
-				<Button aria-label="Play Again" @click="playAgain">
-					Play again!
+				<Button
+					:class="$bem({ e: 'button' })"
+					aria-label="Play Again"
+					@click="playAgain"
+				>
+					Play again
 				</Button>
 			</div>
 		</div>
@@ -140,6 +144,14 @@
 			display: flex;
 			flex-direction: row;
 			justify-content: center;
+		}
+
+		&__button {
+			font-size: 1.25rem;
+			background-color: var(--key-bg-correct);
+			color: var(--key-evaluated-text-color);
+			border: none;
+			outline: none;
 		}
 	}
 </style>

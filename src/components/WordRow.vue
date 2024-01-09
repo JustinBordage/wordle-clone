@@ -39,7 +39,11 @@
 	);
 	const showWinBounce = computed(() => {
 		const isWinningRow = wordleStore.winningRowIndex === props.rowIndex;
-		return isWinningRow && wordleStore.winningRowIndex !== null;
+		return (
+			!isRestoredRow &&
+			isWinningRow &&
+			wordleStore.winningRowIndex !== null
+		);
 	});
 
 	const tileStates = computed(() => {
