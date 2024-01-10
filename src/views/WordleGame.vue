@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { onBeforeMount, onUnmounted, ref } from "vue";
+	import { computed, onBeforeMount, onUnmounted, ref } from "vue";
 	import GameBoard from "@/components/GameBoard.vue";
 	import GameHeader from "@/components/GameHeader.vue";
 	import GenerateWordleDialog from "@/components/generator/GenerateWordleDialog.vue";
@@ -25,11 +25,26 @@
 
 	const wordleStore = useWordleStore();
 
+	// ----- Computed -----
+	const isAnyModalVisible = computed(
+		() =>
+			showGameRules.value ||
+			showGenerator.value ||
+			showStatistics.value ||
+			showSettings.value,
+	);
+
 	// ----- Methods -----
 	const VALID_KEYS = /[A-Za-z]/;
 
 	async function pressKey(key: string) {
-		if (wordleStore.isGameOver || preventKeyInput.value) return;
+		if (
+			wordleStore.isGameOver ||
+			isAnyModalVisible.value ||
+			preventKeyInput.value
+		) {
+			return;
+		}
 
 		switch (key) {
 			case "Backspace":
