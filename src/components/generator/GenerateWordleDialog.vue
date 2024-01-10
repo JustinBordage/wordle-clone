@@ -3,6 +3,7 @@
 	import TextInput from "primevue/inputtext";
 	import Button from "primevue/button";
 	import Modal from "@/components/common/Modal.vue";
+	import { useSpellchecker } from "@/composables/useSpellchecker";
 	import router from "@/router";
 	import { View } from "@/router/views";
 	import { obfuscateSolution } from "@/helpers/wordle-obfuscation";
@@ -18,7 +19,9 @@
 		isVisible: boolean;
 	}>();
 
-	const passPhrase = ref("");
+	const { isMisspelled } = useSpellchecker();
+
+	const customGuess = ref("");
 	const userMsg = ref("");
 	const isErrorMsg = ref(false);
 	const timeout = ref<ReturnType<typeof setTimeout> | null>(null);
@@ -36,7 +39,7 @@
 		const { inputType, data } = event;
 		if (inputType !== "insertText" || !data) return;
 
-		if (passPhrase.value.length + data.length > 11) {
+		if (customGuess.value.length + data.length > 11) {
 			event.preventDefault();
 		}
 	}
@@ -52,12 +55,12 @@
 	}
 
 	function copyWordleLink() {
-		// TODO: Check if submitted word is a valid word.
-		if (passPhrase.value.length < 4) {
+		if (customGuess.value.length < 4 || isMisspelled(customGuess.value)) {
 			setUserMessage("Not a valid word!", true);
+			return;
 		}
 
-		const obfuscatedWord = obfuscateSolution(passPhrase.value);
+		const obfuscatedWord = obfuscateSolution(customGuess.value);
 
 		const { origin } = document.location;
 		const route = router.resolve({
@@ -86,7 +89,7 @@
 			<TextInput
 				:class="$bem({ e: 'word-input' })"
 				placeholder="Your word..."
-				v-model="passPhrase"
+				v-model="customGuess"
 				@beforeinput="restrictLength"
 			/>
 			<p :class="$bem({ e: 'user-msg', m: { error: isErrorMsg } })">
