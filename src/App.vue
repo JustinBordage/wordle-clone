@@ -50,6 +50,6 @@
 
 <template>
 	<div :class="themeClasses">
-		<WordleGame />
+		<router-view />
 	</div>
 </template>

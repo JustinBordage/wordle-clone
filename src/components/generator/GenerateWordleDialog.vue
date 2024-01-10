@@ -1,12 +1,12 @@
 <script setup lang="ts">
 	import { computed, ref } from "vue";
+	import { useRouter } from "vue-router";
 	import TextInput from "primevue/inputtext";
 	import Button from "primevue/button";
 	import Modal from "@/components/common/Modal.vue";
 	import { useSpellchecker } from "@/composables/useSpellchecker";
-	import router from "@/router";
-	import { View } from "@/router/views";
 	import { obfuscateSolution } from "@/helpers/wordle-obfuscation";
+	import { GameMode } from "@/models/enums/GameMode";
 	import { copyToClipboard } from "@/utils/clipboard";
 
 	defineOptions({ name: "GenerateWordleDialog" });
@@ -19,6 +19,7 @@
 		isVisible: boolean;
 	}>();
 
+	const router = useRouter();
 	const { isMisspelled } = useSpellchecker();
 
 	const customGuess = ref("");
@@ -64,7 +65,7 @@
 
 		const { origin } = document.location;
 		const route = router.resolve({
-			name: View.WORDLE_CHALLENGE,
+			name: GameMode.WORDLE_CHALLENGE,
 			params: {
 				solution: obfuscatedWord,
 			},
