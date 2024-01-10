@@ -1,14 +1,10 @@
 <script lang="ts">
 	import { defineComponent } from "vue";
-	import WordleGame from "@/views/WordleGame.vue";
 	import useColorBlindTheme from "@/composables/settings/useColorBlindTheme";
 	import useDarkTheme from "@/composables/settings/useDarkTheme";
 
 	export default defineComponent({
 		name: "App",
-		components: {
-			WordleGame,
-		},
 		computed: {
 			themeClasses() {
 				const themes: string[] = [];
