@@ -1,7 +1,8 @@
 <script setup lang="ts">
-	import { reactive, watch } from "vue";
+	import { computed } from "vue";
 	import type { ChartData, ChartOptions } from "chart.js";
 	import { Bar as BarChart } from "vue-chartjs";
+	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "GuessDistribution" });
 
@@ -14,20 +15,10 @@
 		"6",
 	] as const;
 
-	// The "withDefaults" is temporary until I
-	// complete the rest of the statistics behavior.
-	const props = withDefaults(
-		defineProps<{
-			isCompleted?: boolean;
-			guessIndex?: number;
-			distribution: Record<`${number}`, number>;
-			hasPlayedGame: boolean;
-		}>(),
-		{
-			isCompleted: true,
-			guessIndex: 5,
-		},
-	);
+	const props = defineProps<{
+		distribution: Record<`${number}`, number>;
+		hasPlayedGame: boolean;
+	}>();
 
 	const chartOptions: ChartOptions<"bar"> = {
 		responsive: true,
@@ -58,34 +49,44 @@
 		},
 	} as const;
 
-	function evalGuessDistributionData(): number[] {
-		return GUESS_DISTRIBUTION_LABELS.map(label => {
-			return props.distribution[label] ?? 0;
-		});
-	}
+	const wordleStore = useWordleStore();
 
-	const chartData: ChartData<"bar", number[]> = reactive({
+	const guessDistributionData = computed(() =>
+		GUESS_DISTRIBUTION_LABELS.map(label => {
+			return props.distribution[label] ?? 0;
+		}),
+	);
+
+	const guessResultColors = computed(() => {
+		const compStyle = getComputedStyle(document.body);
+		return {
+			absent: compStyle.getPropertyValue("--color-absent"),
+			present: compStyle.getPropertyValue("--color-present"),
+			correct: compStyle.getPropertyValue("--color-correct"),
+		};
+	});
+
+	const chartData = computed<ChartData<"bar", number[]>>(() => ({
 		labels: GUESS_DISTRIBUTION_LABELS,
 		datasets: [
 			{
 				label: "# of Guesses",
 				backgroundColor: ({ dataIndex }) => {
 					// TODO: Figure out how to get the color from the CSS theme vars.
-					if (props.isCompleted && dataIndex === props.guessIndex) {
-						return "#538d4e";
+					if (
+						wordleStore.isGameOver &&
+						dataIndex === wordleStore.winningRowIndex
+					) {
+						return guessResultColors.value.correct;
 					}
 
-					return "#3a3a3c";
+					return guessResultColors.value.absent;
 				},
-				data: evalGuessDistributionData(),
+				data: guessDistributionData.value,
 				minBarLength: 26,
 			},
 		],
-	});
-
-	watch(evalGuessDistributionData, distributionData => {
-		chartData.datasets[0].data = distributionData;
-	});
+	}));
 </script>
 
 <template>

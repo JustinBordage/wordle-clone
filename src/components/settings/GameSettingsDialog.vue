@@ -1,16 +1,12 @@
 <script setup lang="ts">
-	import { computed, inject } from "vue";
+	import { computed } from "vue";
 	import Modal from "@/components/common/Modal.vue";
 	import GameSettingToggle from "./GameSettingToggle.vue";
 	import useColorBlindTheme from "@/composables/settings/useColorBlindTheme";
 	import useDarkTheme from "@/composables/settings/useDarkTheme";
-	import { HARD_MODE_ENABLED } from "@/configuration/provider-keys";
+	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "GameSettingsDialog" });
-
-	const hardMode = inject(HARD_MODE_ENABLED, false);
-	const isDarkThemeEnabled = useDarkTheme();
-	const isColorBlindThemeEnabled = useColorBlindTheme();
 
 	const emit = defineEmits<{
 		(e: "update:isVisible", value: boolean);
@@ -19,6 +15,10 @@
 	const props = defineProps<{
 		isVisible: boolean;
 	}>();
+
+	const wordleStore = useWordleStore();
+	const isDarkThemeEnabled = useDarkTheme();
+	const isColorBlindThemeEnabled = useColorBlindTheme();
 
 	const visible = computed({
 		get(): boolean {
@@ -40,7 +40,7 @@
 		<GameSettingToggle
 			title="Hard Mode"
 			description="Any revealed hints must be used in subsequent guesses"
-			v-model="hardMode"
+			v-model="wordleStore.isHardModeEnabled"
 		/>
 		<GameSettingToggle title="Dark Theme" v-model="isDarkThemeEnabled" />
 		<GameSettingToggle

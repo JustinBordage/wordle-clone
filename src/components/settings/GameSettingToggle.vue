@@ -36,6 +36,7 @@
 		<InputSwitch
 			:class="$bem({ e: 'switch' })"
 			:disabled="disabled"
+			:aria-label="title"
 			v-model="value"
 		/>
 	</GameSetting>

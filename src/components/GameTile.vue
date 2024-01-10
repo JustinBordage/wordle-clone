@@ -7,20 +7,15 @@
 
 	defineOptions({ name: "GameTile" });
 
-	const props = withDefaults(
-		defineProps<{
-			state: GameTileState;
-			letter: string;
-			tileIndex?: number;
-			doFastFlip?: boolean;
-			isWinningRow?: boolean;
-		}>(),
-		{
-			tileIndex: 0,
-			doFastFlip: false,
-			isWinningRow: false,
-		},
-	);
+	const props = defineProps<{
+		state: GameTileState;
+		letter: string;
+		tileIndex: number;
+		/** If the current row's state was
+		 *  restored from local storage */
+		isRestoredRow: boolean;
+		doBounce: boolean;
+	}>();
 
 	// ----- Data -----
 	const tileRef = ref<HTMLDivElement>();
@@ -62,6 +57,15 @@
 		{ immediate: true },
 	);
 
+	watch(
+		() => props.doBounce,
+		doBounce => {
+			if (doBounce) {
+				animation.value = GameTileAnimation.BOUNCE;
+			}
+		},
+	);
+
 	// ----- Lifecycle Methods -----
 	onMounted(() => {
 		tileRef.value?.addEventListener("animationend", returnToIdle);
@@ -74,7 +78,7 @@
 
 <template>
 	<div
-		:class="$bem({ m: { 'fast-flip': doFastFlip, 'win': isWinningRow } })"
+		:class="$bem({ m: { 'fast-flip': isRestoredRow } })"
 		:data-state="shownState"
 		:data-animation="animation"
 		ref="tileRef"
@@ -103,6 +107,7 @@
 		line-height: 2rem;
 		font-weight: bold;
 		text-transform: uppercase;
+		color: var(--tile-text-color);
 
 		&[data-state="EMPTY"],
 		&[data-state="TBD"] {
@@ -114,7 +119,7 @@
 		}
 
 		&[data-state="TBD"] {
-			background-color: var(--color-tone-7);
+			backdrop-filter: brightness(0.9);
 			border-color: var(--color-tone-3);
 			color: var(--color-tone-1);
 		}
@@ -131,7 +136,7 @@
 			background-color: var(--color-correct);
 		}
 
-		&--win {
+		&[data-animation="bounce"] {
 			animation-name: Bounce;
 			animation-duration: 1000ms;
 			animation-delay: calc(v-bind(tileIndex) * 100ms);

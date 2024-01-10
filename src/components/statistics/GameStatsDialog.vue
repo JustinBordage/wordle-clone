@@ -4,22 +4,22 @@
 	import Modal from "@/components/common/Modal.vue";
 	import GameStat from "@/components/statistics/GameStat.vue";
 	import GuessDistribution from "@/components/statistics/GuessDistribution.vue";
-	import useGameStatistics from "@/composables/useGameStatistics";
-	import { hasGameEnded } from "@/helpers/game-status";
 	import GameStatus from "@/models/enums/GameStatus";
+	import { useStatisticsStore } from "@/stores/statistics";
+	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "GameStatsDialog" });
 
 	const emit = defineEmits<{
 		(e: "update:isVisible", value: boolean);
-		(e: "playAgain");
 	}>();
 
 	const props = defineProps<{
-		gameStatus: GameStatus;
-		solution: string;
 		isVisible: boolean;
 	}>();
+
+	const statisticsStore = useStatisticsStore();
+	const wordleStore = useWordleStore();
 
 	const visible = computed({
 		get(): boolean {
@@ -30,6 +30,7 @@
 		},
 	});
 
+	const statistics = computed(() => statisticsStore.statistics);
 	const winRatio = computed(() => {
 		const { gamesPlayed, gamesLost } = statistics.value;
 		if (gamesPlayed === 0) return 1;
@@ -37,18 +38,23 @@
 		return (gamesPlayed - gamesLost) / gamesPlayed;
 	});
 
-	const statistics = useGameStatistics();
+	function playAgain() {
+		visible.value = false;
+		wordleStore.resetGame();
+	}
 </script>
 
 <template>
 	<Modal :class="$bem({})" v-model:isVisible="visible">
 		<div :class="$bem({ e: 'wrapper' })">
 			<div
-				v-if="gameStatus === GameStatus.LOST"
+				v-if="wordleStore.gameStatus === GameStatus.LOST"
 				:class="$bem({ e: 'answer' })"
 			>
 				<h4>The Wordle was:</h4>
-				<var :class="$bem({ e: 'solution' })">{{ solution }}</var>
+				<var :class="$bem({ e: 'solution' })">{{
+					wordleStore.solution
+				}}</var>
 			</div>
 			<h4 :class="$bem({ e: 'title' })">Statistics</h4>
 			<div :class="$bem({ e: 'metrics' })">
@@ -75,10 +81,16 @@
 				:distribution="statistics.guessDistribution"
 			/>
 			<div
-				v-if="hasGameEnded(gameStatus)"
+				v-if="wordleStore.isGameOver"
 				:class="$bem({ e: 'game-options' })"
 			>
-				<Button @click="$emit('playAgain')">Play again!</Button>
+				<Button
+					:class="$bem({ e: 'button' })"
+					aria-label="Play Again"
+					@click="playAgain"
+				>
+					Play again
+				</Button>
 			</div>
 		</div>
 	</Modal>
@@ -132,6 +144,14 @@
 			display: flex;
 			flex-direction: row;
 			justify-content: center;
+		}
+
+		&__button {
+			font-size: 1.25rem;
+			background-color: var(--key-bg-correct);
+			color: var(--key-evaluated-text-color);
+			border: none;
+			outline: none;
 		}
 	}
 </style>

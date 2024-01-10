@@ -3,17 +3,13 @@
 	import { Icon } from "@iconify/vue";
 	import KeyboardKey from "@/components/keyboard/KeyboardKey.vue";
 	import { keepHighestState } from "@/helpers/tile-states";
-	import GameTileState from "@/models/enums/GameTileState";
+	import { RevealedState } from "@/models/enums/GameTileState";
+	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "GameKeyboard" });
 
 	defineEmits<{
 		(e: "pressKey", value: string);
-	}>();
-
-	const props = defineProps<{
-		results: GameTileState[][];
-		revealedGuesses: string[];
 	}>();
 
 	const keyboardKeys = [
@@ -22,10 +18,12 @@
 		["Enter", "Z", "X", "C", "V", "B", "N", "M", "Backspace"],
 	] as const;
 
+	const wordleStore = useWordleStore();
+
 	const letterStates = computed(() => {
-		return props.results.reduce<Record<string, GameTileState>>(
+		return wordleStore.results.reduce<Record<string, RevealedState>>(
 			(acc, resultRow, index) => {
-				const guessWord = props.revealedGuesses[index] ?? "";
+				const guessWord = wordleStore.guesses[index] ?? "";
 
 				resultRow.forEach((newLetterState, index) => {
 					const letter = guessWord.charAt(index);
