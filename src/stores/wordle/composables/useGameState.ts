@@ -1,10 +1,12 @@
 import { useLocalStorage } from "@vueuse/core";
 import { WORDLE_LENGTH } from "@/configuration/magic-numbers";
 import { generateWordle } from "@/helpers/wordle";
+import {
+	deobfuscateSolution,
+	obfuscateSolution,
+} from "@/helpers/wordle-obfuscation";
 import { RevealedState } from "@/models/enums/GameTileState";
-import { b64Decode, b64Encode } from "@/utils/base64";
 import { deepClone } from "@/utils/cloning";
-import { reverse } from "@/utils/string";
 
 /** This is for when the solution hasn't yet been generated. Since the
  *  words list needs to be pulled with an asynchronous http request.
@@ -90,21 +92,3 @@ type GameState = {
 	 *   discourage cheating, not that it matters really. */
 	solution: string;
 };
-
-/** Obfuscates the solution by encoding it
- *  in an unpadded base 64 format, reversing
- *  the result and then encoding in b64 again.
- *
- *  @remark This is NOT encryption, nor does it have to be! */
-function obfuscateSolution(solution: string): string {
-	let obfuscatedWord = b64Encode(solution, true);
-	obfuscatedWord = reverse(obfuscatedWord);
-	return b64Encode(obfuscatedWord, true);
-}
-
-/** De-obfuscates the solution */
-function deobfuscateSolution(obfuscatedSolution: string): string {
-	let deobfuscatedWord = b64Decode(obfuscatedSolution);
-	deobfuscatedWord = reverse(deobfuscatedWord);
-	return b64Decode(deobfuscatedWord);
-}
