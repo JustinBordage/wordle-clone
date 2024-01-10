@@ -2,7 +2,7 @@ import { MAX_GUESSES } from "@/configuration/magic-numbers";
 import GameStatus, { GameOutcome } from "@/models/enums/GameStatus";
 
 function isGameWon(solution: string, guesses: string[]) {
-	return guesses.includes(solution);
+	return guesses.includes(solution.toUpperCase());
 }
 
 function hasUsedAllGuesses(activeRow: number) {
