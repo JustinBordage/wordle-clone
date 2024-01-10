@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { useThrottleFn } from "@vueuse/core";
 import useGameState from "./composables/useGameState";
 import useHardMode from "./composables/useHardMode";
-import useIsValidWord from "./composables/useIsValidWord";
+import { useSpellchecker } from "@/composables/useSpellchecker";
 import { MAX_GUESSES } from "@/configuration/magic-numbers";
 import { evalGameStatus, hasGameEnded } from "./helpers/game-status";
 import { generateWordle } from "@/helpers/wordle";
@@ -24,6 +24,7 @@ export const useWordleStore = defineStore("wordle", () => {
 	const statisticsStore = useStatisticsStore();
 	const { gameState, setSolution, persistGuess, initializeState } =
 		useGameState();
+	const { isMisspelled } = useSpellchecker();
 
 	// ----- State -----
 	const privateState = usePrivateWordleStore();
@@ -41,12 +42,10 @@ export const useWordleStore = defineStore("wordle", () => {
 	const isHardModeEnabled = useHardMode(hasGameStarted);
 
 	// ----- Methods -----
-	const isValidWord = useIsValidWord(() => solution.value.length);
-
 	function validateGuess(guess: string): boolean {
 		if (solution.value.length !== guess.length) return false;
 
-		if (!isValidWord(guess)) {
+		if (isMisspelled(guess)) {
 			messageStore.setMessage(
 				GameMessageType.WARNING,
 				"This word is not valid!",
