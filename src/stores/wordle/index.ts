@@ -6,7 +6,6 @@ import useHardMode from "./composables/useHardMode";
 import { useSpellchecker } from "@/composables/useSpellchecker";
 import { MAX_GUESSES } from "@/configuration/magic-numbers";
 import { evalGameStatus, hasGameEnded } from "./helpers/game-status";
-import { generateWordle } from "@/helpers/wordle";
 import { validateRow } from "./helpers/validation";
 import { GameMessageType } from "@/models/enums/GameMessageType";
 import { GameMode } from "@/models/enums/GameMode";
@@ -100,10 +99,7 @@ export const useWordleStore = defineStore("wordle", () => {
 	}, 250);
 
 	async function resetGame() {
-		resetProgress(
-			await generateWordle(GameMode.WORDLE_CHALLENGE),
-			GameMode.WORDLE_CHALLENGE,
-		);
+		await resetProgress(GameMode.WORDLE_DAILY);
 		messageStore.showGameStartMessage();
 		privateState.gameStatus = GameStatus.NOT_STARTED;
 		winningRowIndex.value = null;

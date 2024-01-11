@@ -17,7 +17,6 @@ import { deepClone } from "@/utils/cloning";
  *  The length should be the same length as the generated Wordle. */
 const SOLUTION_PLACEHOLDER = "_".repeat(WORDLE_LENGTH);
 
-/** This shouldn't be directly accessed. Instead, go through the "WordleStore" */
 export default function useGameState() {
 	const router = useRouter();
 	const gameMode = useGameMode();
@@ -47,8 +46,11 @@ export default function useGameState() {
 		},
 	);
 
-	/** Resets the game's persisted progress. */
-	async function resetProgress(newSolution: string, gameMode: GameMode) {
+	async function resetProgress(
+		gameMode: GameMode,
+		solution: string | Promise<string> = generateWordle(gameMode),
+	) {
+		const newSolution: string = await solution;
 		gameState.value = {
 			guesses: [],
 			results: [],
@@ -74,25 +76,19 @@ export default function useGameState() {
 				solution === SOLUTION_PLACEHOLDER ||
 				savedGameMode !== currGameMode
 			) {
-				await resetProgress(
-					await generateWordle(currGameMode),
-					currGameMode,
-				);
+				await resetProgress(currGameMode);
 			}
 		} else {
 			try {
 				const challengeSolution = getChallengeSolution();
 				if (solution !== challengeSolution) {
 					await resetProgress(
-						challengeSolution,
 						GameMode.WORDLE_CHALLENGE,
+						challengeSolution,
 					);
 				}
 			} catch (e) {
-				await resetProgress(
-					await generateWordle(GameMode.WORDLE_DAILY),
-					GameMode.WORDLE_DAILY,
-				);
+				await resetProgress(GameMode.WORDLE_DAILY);
 			}
 		}
 	}
