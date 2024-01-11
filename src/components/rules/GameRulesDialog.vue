@@ -2,7 +2,7 @@
 	import { computed } from "vue";
 	import Modal from "@/components/common/Modal.vue";
 	import GameRulesExample from "@/components/rules/GameRulesExample.vue";
-	import { MAX_GUESSES, WORDLE_LENGTH } from "@/configuration/magic-numbers";
+	import { MAX_GUESSES, WORDLE_LENGTH } from "@/configuration/constants";
 	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "GameRulesDialog" });

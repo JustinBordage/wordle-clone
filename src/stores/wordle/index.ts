@@ -5,7 +5,7 @@ import useGameState from "./composables/useGameState";
 import useHardMode from "./composables/useHardMode";
 import { useGameMode } from "@/composables/useGameMode";
 import { useSpellchecker } from "@/composables/useSpellchecker";
-import { MAX_GUESSES } from "@/configuration/magic-numbers";
+import { MAX_GUESSES } from "@/configuration/constants";
 import { evalGameStatus, hasGameEnded } from "./helpers/game-status";
 import { generateWordle } from "@/helpers/wordle";
 import { validateRow } from "./helpers/validation";

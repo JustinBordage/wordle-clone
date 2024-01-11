@@ -1,4 +1,4 @@
-import { MAX_GUESSES } from "@/configuration/magic-numbers";
+import { MAX_GUESSES } from "@/configuration/constants";
 import GameStatus, { GameOutcome } from "@/models/enums/GameStatus";
 
 function isGameWon(solution: string, guesses: string[]) {

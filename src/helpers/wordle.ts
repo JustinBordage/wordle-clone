@@ -1,4 +1,3 @@
-import { truncateTime } from "@/utils/date.ts";
 import {
 	englishDataset,
 	englishRecommendedTransformers,
@@ -7,8 +6,9 @@ import {
 import { getWordsList } from "@/adapters/wordle";
 import { useGameMode } from "@/composables/useGameMode";
 import { usePickRandomWord } from "@/composables/usePickRandomWord";
-import { WORDLE_LENGTH } from "@/configuration/magic-numbers";
+import { WORDLE_LENGTH } from "@/configuration/constants";
 import { GameMode } from "@/models/enums/GameMode";
+import { truncateTime } from "@/utils/date";
 
 function getProfanityChecker(): RegExpMatcher {
 	return new RegExpMatcher({

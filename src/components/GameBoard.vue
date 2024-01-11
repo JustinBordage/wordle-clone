@@ -2,7 +2,7 @@
 	import { ref } from "vue";
 	import WordRow from "@/components/WordRow.vue";
 	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
-	import { MAX_GUESSES } from "@/configuration/magic-numbers";
+	import { MAX_GUESSES } from "@/configuration/constants";
 	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "GameBoard" });

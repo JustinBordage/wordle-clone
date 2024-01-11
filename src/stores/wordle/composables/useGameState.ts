@@ -1,7 +1,7 @@
 import { useRoute, useRouter } from "vue-router";
 import { useLocalStorage } from "@vueuse/core";
 import { useGameMode } from "@/composables/useGameMode";
-import { WORDLE_LENGTH } from "@/configuration/magic-numbers";
+import { WORDLE_LENGTH } from "@/configuration/constants";
 import { generateWordle } from "@/helpers/wordle";
 import {
 	deobfuscateSolution,
