@@ -1,3 +1,4 @@
+import { truncateTime } from "@/utils/date.ts";
 import {
 	englishDataset,
 	englishRecommendedTransformers,
@@ -17,15 +18,7 @@ function getProfanityChecker(): RegExpMatcher {
 }
 
 function getDailySeed(): number {
-	const today = new Date();
-
-	// Truncates the time
-	today.setUTCHours(0);
-	today.setUTCMinutes(0);
-	today.setUTCSeconds(0);
-	today.setUTCMilliseconds(0);
-
-	return today.getTime();
+	return truncateTime(new Date()).getTime();
 }
 
 /** Chooses a non-profane word as the Wordle, since we don't
