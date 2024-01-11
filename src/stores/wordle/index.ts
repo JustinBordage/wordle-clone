@@ -3,9 +3,11 @@ import { defineStore } from "pinia";
 import { useThrottleFn } from "@vueuse/core";
 import useGameState from "./composables/useGameState";
 import useHardMode from "./composables/useHardMode";
+import { useGameMode } from "@/composables/useGameMode";
 import { useSpellchecker } from "@/composables/useSpellchecker";
 import { MAX_GUESSES } from "@/configuration/magic-numbers";
 import { evalGameStatus, hasGameEnded } from "./helpers/game-status";
+import { generateWordle } from "@/helpers/wordle";
 import { validateRow } from "./helpers/validation";
 import { GameMessageType } from "@/models/enums/GameMessageType";
 import { GameMode } from "@/models/enums/GameMode";
@@ -25,6 +27,7 @@ export const useWordleStore = defineStore("wordle", () => {
 	const { gameState, resetProgress, persistGuess, initializeState } =
 		useGameState();
 	const { isMisspelled } = useSpellchecker();
+	const gameMode = useGameMode();
 
 	// ----- State -----
 	const privateState = usePrivateWordleStore();
@@ -108,6 +111,13 @@ export const useWordleStore = defineStore("wordle", () => {
 
 	async function initialize() {
 		await initializeState();
+
+		if (gameMode.value === GameMode.WORDLE_DAILY) {
+			const wordle = await generateWordle(GameMode.WORDLE_DAILY);
+			if (wordle !== solution.value) {
+				await resetProgress(GameMode.WORDLE_DAILY, wordle);
+			}
+		}
 
 		const gameStatus = evalGameStatus(
 			solution.value,
