@@ -100,7 +100,10 @@ export const useWordleStore = defineStore("wordle", () => {
 	}, 250);
 
 	async function resetGame() {
-		resetProgress(await generateWordle(), GameMode.WORDLE_CHALLENGE);
+		resetProgress(
+			await generateWordle(GameMode.WORDLE_CHALLENGE),
+			GameMode.WORDLE_CHALLENGE,
+		);
 		messageStore.showGameStartMessage();
 		privateState.gameStatus = GameStatus.NOT_STARTED;
 		winningRowIndex.value = null;

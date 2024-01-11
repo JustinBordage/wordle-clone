@@ -74,7 +74,10 @@ export default function useGameState() {
 				solution === SOLUTION_PLACEHOLDER ||
 				savedGameMode !== currGameMode
 			) {
-				await resetProgress(await generateWordle(), currGameMode);
+				await resetProgress(
+					await generateWordle(currGameMode),
+					currGameMode,
+				);
 			}
 		} else {
 			try {
@@ -87,7 +90,7 @@ export default function useGameState() {
 				}
 			} catch (e) {
 				await resetProgress(
-					await generateWordle(),
+					await generateWordle(GameMode.WORDLE_DAILY),
 					GameMode.WORDLE_DAILY,
 				);
 			}

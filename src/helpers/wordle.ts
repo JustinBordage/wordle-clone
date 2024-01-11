@@ -1,11 +1,13 @@
 import {
-	RegExpMatcher,
 	englishDataset,
 	englishRecommendedTransformers,
+	RegExpMatcher,
 } from "obscenity";
 import { getWordsList } from "@/adapters/wordle";
+import { useGameMode } from "@/composables/useGameMode";
+import { usePickRandomWord } from "@/composables/usePickRandomWord";
 import { WORDLE_LENGTH } from "@/configuration/magic-numbers";
-import { pickRandomWord } from "@/utils/random";
+import { GameMode } from "@/models/enums/GameMode";
 
 function getProfanityChecker(): RegExpMatcher {
 	return new RegExpMatcher({
@@ -14,9 +16,25 @@ function getProfanityChecker(): RegExpMatcher {
 	});
 }
 
+function getDailySeed(): number {
+	const today = new Date();
+
+	// Truncates the time
+	today.setUTCHours(0);
+	today.setUTCMinutes(0);
+	today.setUTCSeconds(0);
+	today.setUTCMilliseconds(0);
+
+	return today.getTime();
+}
+
 /** Chooses a non-profane word as the Wordle, since we don't
  *  want the game to be teaching profanities to the users. */
-function getSafeWord(wordList: string[]): string {
+function getSafeWord(wordList: string[], gameMode: GameMode): string {
+	const seed =
+		gameMode === GameMode.WORDLE_DAILY ? getDailySeed() : undefined;
+	const pickRandomWord = usePickRandomWord(seed);
+
 	const profanityChecker = getProfanityChecker();
 	let wordle: string | null = null;
 	let attempts = 0;
@@ -41,11 +59,11 @@ function getSafeWord(wordList: string[]): string {
 	return wordle;
 }
 
-export async function generateWordle() {
+export async function generateWordle(gameMode: GameMode = useGameMode().value) {
 	const words = await getWordsList(WORDLE_LENGTH);
 	if (words.length === 0) {
 		throw new Error("Failed to generate Wordle!");
 	}
 
-	return getSafeWord(words);
+	return getSafeWord(words, gameMode);
 }
