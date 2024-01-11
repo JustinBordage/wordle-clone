@@ -32,3 +32,11 @@ export function isNotBlank(
 ): strVal is string {
 	return !isBlank(strVal);
 }
+
+export function padNumberStart(
+	num: number,
+	maxLength: number,
+	fillString: string = "0",
+) {
+	return num.toString().padStart(maxLength, fillString);
+}

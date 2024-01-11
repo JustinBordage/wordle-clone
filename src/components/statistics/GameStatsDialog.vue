@@ -4,6 +4,7 @@
 	import Modal from "@/components/common/Modal.vue";
 	import GameStat from "@/components/statistics/GameStat.vue";
 	import GuessDistribution from "@/components/statistics/GuessDistribution.vue";
+	import NextWordleCountdown from "@/components/statistics/NextWordleCountdown.vue";
 	import { useGameMode } from "@/composables/useGameMode";
 	import { GameMode } from "@/models/enums/GameMode";
 	import GameStatus from "@/models/enums/GameStatus";
@@ -39,6 +40,12 @@
 		if (gamesPlayed === 0) return 1;
 
 		return (gamesPlayed - gamesLost) / gamesPlayed;
+	});
+
+	const showCountdown = computed(() => {
+		return (
+			wordleStore.isGameOver && gameMode.value === GameMode.WORDLE_DAILY
+		);
 	});
 
 	const playAgainText = computed(() => {
@@ -90,6 +97,7 @@
 				:distribution="statistics.guessDistribution"
 			/>
 			<div :class="$bem({ e: 'game-options' })">
+				<NextWordleCountdown v-if="showCountdown" />
 				<Button
 					:class="$bem({ e: 'button' })"
 					:aria-label="playAgainText"
