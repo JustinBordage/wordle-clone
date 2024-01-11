@@ -6,3 +6,7 @@ export enum GameMode {
 	/** A user generated Wordle challenge gamemode. */
 	WORDLE_CHALLENGE = "CHALLENGE",
 }
+
+export function isWordleDaily(gameMode: GameMode) {
+	return gameMode === GameMode.WORDLE_DAILY;
+}
