@@ -1,10 +1,15 @@
+import { useRoute, useRouter } from "vue-router";
 import { useLocalStorage } from "@vueuse/core";
+import { useGameMode } from "@/composables/useGameMode";
 import { WORDLE_LENGTH } from "@/configuration/magic-numbers";
 import { generateWordle } from "@/helpers/wordle";
+import {
+	deobfuscateSolution,
+	obfuscateSolution,
+} from "@/helpers/wordle-obfuscation";
+import { GameMode } from "@/models/enums/GameMode";
 import { RevealedState } from "@/models/enums/GameTileState";
-import { b64Decode, b64Encode } from "@/utils/base64";
 import { deepClone } from "@/utils/cloning";
-import { reverse } from "@/utils/string";
 
 /** This is for when the solution hasn't yet been generated. Since the
  *  words list needs to be pulled with an asynchronous http request.
@@ -14,12 +19,16 @@ const SOLUTION_PLACEHOLDER = "_".repeat(WORDLE_LENGTH);
 
 /** This shouldn't be directly accessed. Instead, go through the "WordleStore" */
 export default function useGameState() {
+	const router = useRouter();
+	const gameMode = useGameMode();
+
 	const gameState = useLocalStorage(
 		"gameState",
 		() => ({
 			guesses: [],
 			results: [],
 			solution: SOLUTION_PLACEHOLDER,
+			gameMode: gameMode.value,
 		}),
 		{
 			serializer: {
@@ -38,21 +47,50 @@ export default function useGameState() {
 		},
 	);
 
-	/** Sets the game's solution word.
-	 *
-	 *  @remark Setting this value will
-	 *   wipe any existing game progress! */
-	function setSolution(solution: string) {
+	/** Resets the game's persisted progress. */
+	async function resetProgress(newSolution: string, gameMode: GameMode) {
 		gameState.value = {
 			guesses: [],
 			results: [],
-			solution,
+			solution: newSolution.toUpperCase(),
+			gameMode,
 		};
+
+		await router.replace({
+			name: gameMode,
+			params:
+				gameMode === GameMode.WORDLE_CHALLENGE
+					? { solution: obfuscateSolution(newSolution) }
+					: undefined,
+		});
 	}
 
 	async function initializeState() {
-		if (gameState.value.solution === SOLUTION_PLACEHOLDER) {
-			setSolution(await generateWordle());
+		const currGameMode = gameMode.value;
+		const { solution, gameMode: savedGameMode } = gameState.value;
+
+		if (currGameMode !== GameMode.WORDLE_CHALLENGE) {
+			if (
+				solution === SOLUTION_PLACEHOLDER ||
+				savedGameMode !== currGameMode
+			) {
+				await resetProgress(await generateWordle(), currGameMode);
+			}
+		} else {
+			try {
+				const challengeSolution = getChallengeSolution();
+				if (solution !== challengeSolution) {
+					await resetProgress(
+						challengeSolution,
+						GameMode.WORDLE_CHALLENGE,
+					);
+				}
+			} catch (e) {
+				await resetProgress(
+					await generateWordle(),
+					GameMode.WORDLE_DAILY,
+				);
+			}
 		}
 	}
 
@@ -62,8 +100,8 @@ export default function useGameState() {
 		rowIndex: number,
 	) {
 		const { results, guesses, ...rest } = deepClone(gameState.value);
+		guesses.splice(rowIndex, 1, guess.toUpperCase());
 		results.splice(rowIndex, 1, evaluation);
-		guesses.splice(rowIndex, 1, guess);
 
 		gameState.value = {
 			guesses,
@@ -74,7 +112,7 @@ export default function useGameState() {
 
 	return {
 		gameState,
-		setSolution,
+		resetProgress,
 		initializeState,
 		persistGuess,
 	};
@@ -89,22 +127,14 @@ type GameState = {
 	 *  @remark The value is obfuscated when serialized to
 	 *   discourage cheating, not that it matters really. */
 	solution: string;
+	gameMode: GameMode;
 };
 
-/** Obfuscates the solution by encoding it
- *  in an unpadded base 64 format, reversing
- *  the result and then encoding in b64 again.
- *
- *  @remark This is NOT encryption, nor does it have to be! */
-function obfuscateSolution(solution: string): string {
-	let obfuscatedWord = b64Encode(solution, true);
-	obfuscatedWord = reverse(obfuscatedWord);
-	return b64Encode(obfuscatedWord, true);
-}
+function getChallengeSolution() {
+	const solutionParam = useRoute().params.solution;
+	const rawSolution = Array.isArray(solutionParam)
+		? solutionParam[0]
+		: solutionParam;
 
-/** De-obfuscates the solution */
-function deobfuscateSolution(obfuscatedSolution: string): string {
-	let deobfuscatedWord = b64Decode(obfuscatedSolution);
-	deobfuscatedWord = reverse(deobfuscatedWord);
-	return b64Decode(deobfuscatedWord);
+	return deobfuscateSolution(rawSolution);
 }

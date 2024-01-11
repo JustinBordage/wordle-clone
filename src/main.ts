@@ -1,3 +1,4 @@
+import router from "@/router";
 import { createApp } from "vue";
 import PrimeVue from "primevue/config";
 import Ripple from "primevue/ripple";
@@ -29,6 +30,7 @@ ChartJS.register(
 
 createApp(App)
 	.use(createPinia())
+	.use(router)
 	.use(PrimeVue, {
 		pt: {
 			chip: {

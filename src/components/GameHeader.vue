@@ -1,10 +1,12 @@
 <script setup lang="ts">
 	import { Icon } from "@iconify/vue";
+	import WordleGeneratorIcon from "@/assets/generate-wordle.svg";
 
 	defineOptions({ name: "GameHeader" });
 
 	defineEmits<{
 		(e: "openRules");
+		(e: "openGenerator");
 		(e: "openStats");
 		(e: "openSettings");
 	}>();
@@ -19,6 +21,14 @@
 				@click="$emit('openRules')"
 			>
 				<Icon icon="mdi:help-circle" />
+			</button>
+			<button
+				:class="$bem({ e: 'control' })"
+				@click="$emit('openGenerator')"
+			>
+				<span :class="$bem({ e: 'generator-icon' })">
+					<WordleGeneratorIcon />
+				</span>
 			</button>
 		</span>
 		<h1 :class="$bem({ e: 'title' })">WORDLE</h1>
@@ -63,6 +73,7 @@
 
 		&__control {
 			display: inline-flex;
+			align-items: center;
 			width: fit-content;
 			min-width: initial;
 			padding: 0.25rem;
@@ -70,6 +81,17 @@
 			color: var(--color-tone-3);
 			background-color: transparent;
 			appearance: none;
+		}
+
+		&__generator-icon {
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			width: 2rem;
+			height: 1.5rem;
+			background-color: var(--color-tone-3);
+			color: var(--surface-ground);
+			border-radius: 0.25rem;
 		}
 
 		&__title {

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-	import { onBeforeMount, onUnmounted, ref } from "vue";
+	import { computed, onBeforeMount, onUnmounted, ref } from "vue";
 	import GameBoard from "@/components/GameBoard.vue";
 	import GameHeader from "@/components/GameHeader.vue";
+	import GenerateWordleDialog from "@/components/generator/GenerateWordleDialog.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
 	import GameMessageManager from "@/components/messages/GameMessageManager.vue";
 	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
@@ -17,17 +18,33 @@
 	const showGameRules = ref(false);
 	const showStatistics = ref(false);
 	const showSettings = ref(false);
+	const showGenerator = ref(false);
 	/** Used to prevent inputs while the
 	 *  tile flip animation is running. */
 	const preventKeyInput = ref(false);
 
 	const wordleStore = useWordleStore();
 
+	// ----- Computed -----
+	const isAnyModalVisible = computed(
+		() =>
+			showGameRules.value ||
+			showGenerator.value ||
+			showStatistics.value ||
+			showSettings.value,
+	);
+
 	// ----- Methods -----
 	const VALID_KEYS = /[A-Za-z]/;
 
 	async function pressKey(key: string) {
-		if (wordleStore.isGameOver || preventKeyInput.value) return;
+		if (
+			wordleStore.isGameOver ||
+			isAnyModalVisible.value ||
+			preventKeyInput.value
+		) {
+			return;
+		}
 
 		switch (key) {
 			case "Backspace":
@@ -82,6 +99,7 @@
 	<div v-if="!isLoading" :class="$bem({})">
 		<GameHeader
 			@openRules="showGameRules = true"
+			@openGenerator="showGenerator = true"
 			@openStats="showStatistics = true"
 			@openSettings="showSettings = true"
 		/>
@@ -92,6 +110,7 @@
 		<GameRulesDialog v-model:isVisible="showGameRules" />
 		<GameStatsDialog v-model:isVisible="showStatistics" />
 		<GameSettingsDialog v-model:isVisible="showSettings" />
+		<GenerateWordleDialog v-model:isVisible="showGenerator" />
 	</div>
 </template>
 

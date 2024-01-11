@@ -9,6 +9,7 @@ import { evalGameStatus, hasGameEnded } from "./helpers/game-status";
 import { generateWordle } from "@/helpers/wordle";
 import { validateRow } from "./helpers/validation";
 import { GameMessageType } from "@/models/enums/GameMessageType";
+import { GameMode } from "@/models/enums/GameMode";
 import GameStatus from "@/models/enums/GameStatus";
 import { useMessageStore } from "@/stores/message";
 import { useStatisticsStore } from "@/stores/statistics";
@@ -22,7 +23,7 @@ const usePrivateWordleStore = defineStore("privateWordle", {
 export const useWordleStore = defineStore("wordle", () => {
 	const messageStore = useMessageStore();
 	const statisticsStore = useStatisticsStore();
-	const { gameState, setSolution, persistGuess, initializeState } =
+	const { gameState, resetProgress, persistGuess, initializeState } =
 		useGameState();
 	const { isMisspelled } = useSpellchecker();
 
@@ -43,7 +44,11 @@ export const useWordleStore = defineStore("wordle", () => {
 
 	// ----- Methods -----
 	function validateGuess(guess: string): boolean {
-		if (solution.value.length !== guess.length) return false;
+		if (solution.value.length !== guess.length) {
+			return false;
+		} else if (solution.value === guess) {
+			return true;
+		}
 
 		if (isMisspelled(guess)) {
 			messageStore.setMessage(
@@ -95,7 +100,7 @@ export const useWordleStore = defineStore("wordle", () => {
 	}, 250);
 
 	async function resetGame() {
-		setSolution(await generateWordle());
+		resetProgress(await generateWordle(), GameMode.WORDLE_CHALLENGE);
 		messageStore.showGameStartMessage();
 		privateState.gameStatus = GameStatus.NOT_STARTED;
 		winningRowIndex.value = null;
