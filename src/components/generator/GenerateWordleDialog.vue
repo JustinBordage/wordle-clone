@@ -96,7 +96,9 @@
 			<p :class="$bem({ e: 'user-msg', m: { error: isErrorMsg } })">
 				{{ userMsg }}
 			</p>
-			<Button @click="copyWordleLink"> Copy Link</Button>
+			<Button :class="$bem({ e: 'copy-link' })" @click="copyWordleLink">
+				Copy Link
+			</Button>
 		</div>
 	</Modal>
 </template>
@@ -122,6 +124,12 @@
 			&--error {
 				color: #d36b8d;
 			}
+		}
+
+		&__copy-link {
+			background-color: var(--key-bg-correct);
+			color: var(--key-evaluated-text-color);
+			border: none;
 		}
 	}
 </style>
