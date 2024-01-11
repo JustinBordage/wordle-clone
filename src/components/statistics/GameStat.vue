@@ -1,18 +1,24 @@
 <script setup lang="ts">
 	defineOptions({ name: "GameStat" });
 
-	defineProps<{
-		label: string;
-		value: number;
-	}>();
+	withDefaults(
+		defineProps<{
+			label: string;
+			value: number;
+			wrapLabel?: boolean;
+		}>(),
+		{
+			wrapLabel: true,
+		},
+	);
 </script>
 
 <template>
-	<div class="game-stat">
-		<var class="game-stat__value">
+	<div :class="$bem({})">
+		<var :class="$bem({ e: 'value' })">
 			{{ value }}
 		</var>
-		<label class="game-stat__label">
+		<label :class="$bem({ e: 'label', m: { wrap: wrapLabel } })">
 			{{ label }}
 		</label>
 	</div>
@@ -33,11 +39,18 @@
 			font-weight: 400;
 			max-height: fit-content;
 			font-style: normal;
+			letter-spacing: 0.05em;
+			font-variant-numeric: proportional-nums;
 		}
 
 		&__label {
-			width: 57px;
 			font-size: 0.75rem;
+			min-width: 41px;
+			width: 100%;
+
+			&--wrap {
+				width: min-content;
+			}
 		}
 	}
 </style>

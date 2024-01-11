@@ -2,11 +2,8 @@
 	import { computed } from "vue";
 	import Modal from "@/components/common/Modal.vue";
 	import GameRulesExample from "@/components/rules/GameRulesExample.vue";
-	import {
-		MAX_GUESSES,
-		WORDLE_LENGTH,
-	} from "@/configuration/magic-numbers.ts";
-	import GameTileState from "@/models/enums/GameTileState.ts";
+	import { MAX_GUESSES, WORDLE_LENGTH } from "@/configuration/constants";
+	import GameTileState from "@/models/enums/GameTileState";
 
 	defineOptions({ name: "GameRulesDialog" });
 
@@ -29,11 +26,7 @@
 </script>
 
 <template>
-	<Modal
-		class="game-rules-dialog"
-		title="HOW TO PLAY"
-		v-model:isVisible="visible"
-	>
+	<Modal :class="$bem({})" title="HOW TO PLAY" v-model:isVisible="visible">
 		<section>
 			<p>Guess the <b>WORDLE</b> in {{ MAX_GUESSES }} tries.</p>
 			<p>
@@ -44,7 +37,7 @@
 				After each guess, the color of the tiles will change to show how
 				close your guess was to the word.
 			</p>
-			<div class="game-rules-dialog__examples">
+			<div :class="$bem({ e: 'examples' })">
 				<p><b>Examples</b></p>
 				<GameRulesExample
 					exampleWord="WEARY"

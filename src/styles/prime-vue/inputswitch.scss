@@ -1,0 +1,11 @@
+@layer base, primevue, custom_primevue;
+
+@layer custom_primevue {
+	.p-inputswitch {
+		&-checked & {
+			&-slider {
+				background-color: var(--color-correct, #34D399);
+			}
+		}
+	}
+}

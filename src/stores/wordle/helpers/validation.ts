@@ -1,6 +1,6 @@
 import GameTileState, { RevealedState } from "@/models/enums/GameTileState";
 
-export function validateWordle(wordle: string, guess: string): RevealedState[] {
+export function validateRow(wordle: string, guess: string): RevealedState[] {
 	const solution = Array.from(wordle.toUpperCase());
 	const guessWord = Array.from(guess.toUpperCase());
 
@@ -8,6 +8,7 @@ export function validateWordle(wordle: string, guess: string): RevealedState[] {
 		return Array(wordle.length).fill(GameTileState.CORRECT);
 	}
 
+	// Validates letters in correct positions
 	const result: RevealedState[] = solution.map((letter, index) => {
 		if (guessWord[index] !== letter) {
 			return GameTileState.ABSENT;
@@ -18,6 +19,7 @@ export function validateWordle(wordle: string, guess: string): RevealedState[] {
 		return GameTileState.CORRECT;
 	});
 
+	// Validates letters in incorrect positions
 	guessWord.forEach((letter, guessIndex) => {
 		if (letter === "") return;
 

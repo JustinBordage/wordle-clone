@@ -1,29 +1,47 @@
 <script setup lang="ts">
+	import { ref } from "vue";
 	import WordRow from "@/components/WordRow.vue";
 	import { useIdSetGenerator } from "@/composables/useIdSetGenerator";
-	import { MAX_GUESSES } from "@/configuration/magic-numbers.ts";
+	import { MAX_GUESSES } from "@/configuration/constants";
+	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "GameBoard" });
 
-	defineProps<{
-		solution: string;
-		guesses: string[];
-		activeRow: number;
+	defineEmits<{
+		(e: "revealComplete");
 	}>();
+
+	const props = defineProps<{
+		currGuess: string;
+	}>();
+
+	// ----- Stores -----
+	const wordleStore = useWordleStore();
+
+	// ----- Data -----
+	const gameBoard = ref<HTMLDivElement | null>(null);
+
+	// ----- Methods -----
+	function getRowGuess(index: number) {
+		if (index !== wordleStore.activeRowIndex) {
+			return wordleStore.guesses[index] ?? "";
+		} else {
+			return props.currGuess;
+		}
+	}
 
 	// ----- Composables -----
 	const rowIds = useIdSetGenerator(() => MAX_GUESSES);
 </script>
 
 <template>
-	<div class="game-board">
+	<div :class="$bem({})" ref="gameBoard">
 		<WordRow
 			v-for="(id, index) in rowIds"
 			:key="id"
-			:solution="solution"
-			:isRevealed="activeRow > index"
-			:isActiveRow="activeRow === index"
-			:guess="guesses[index] ?? ''"
+			:guess="getRowGuess(index)"
+			:rowIndex="index"
+			@revealComplete="$emit('revealComplete')"
 		/>
 	</div>
 </template>

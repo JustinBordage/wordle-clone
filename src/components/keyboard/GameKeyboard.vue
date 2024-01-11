@@ -2,17 +2,14 @@
 	import { computed } from "vue";
 	import { Icon } from "@iconify/vue";
 	import KeyboardKey from "@/components/keyboard/KeyboardKey.vue";
-	import GameTileState from "@/models/enums/GameTileState";
+	import { keepHighestState } from "@/helpers/tile-states";
+	import { RevealedState } from "@/models/enums/GameTileState";
+	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "GameKeyboard" });
 
 	defineEmits<{
 		(e: "pressKey", value: string);
-	}>();
-
-	const props = defineProps<{
-		results: GameTileState[][];
-		revealedGuesses: string[];
 	}>();
 
 	const keyboardKeys = [
@@ -21,22 +18,18 @@
 		["Enter", "Z", "X", "C", "V", "B", "N", "M", "Backspace"],
 	] as const;
 
+	const wordleStore = useWordleStore();
+
 	const letterStates = computed(() => {
-		return props.results.reduce<Record<string, GameTileState>>(
+		return wordleStore.results.reduce<Record<string, RevealedState>>(
 			(acc, resultRow, index) => {
-				const guessWord = props.revealedGuesses[index] ?? "";
+				const guessWord = wordleStore.guesses[index] ?? "";
 
 				resultRow.forEach((newLetterState, index) => {
 					const letter = guessWord.charAt(index);
 					if (letter === "") return;
 
-					const currLetterState = acc[letter];
-					if (
-						getStatePriority(newLetterState) >
-						getStatePriority(currLetterState)
-					) {
-						acc[letter] = newLetterState;
-					}
+					acc[letter] = keepHighestState(newLetterState, acc[letter]);
 				});
 
 				return acc;
@@ -44,27 +37,14 @@
 			{},
 		);
 	});
-
-	function getStatePriority(state: GameTileState) {
-		switch (state) {
-			case GameTileState.ABSENT:
-				return 1;
-			case GameTileState.PRESENT:
-				return 2;
-			case GameTileState.CORRECT:
-				return 3;
-			default:
-				return 0;
-		}
-	}
 </script>
 
 <template>
-	<div class="game-keyboard">
+	<div :class="$bem({})">
 		<div
 			v-for="(keySet, rowIndex) in keyboardKeys"
 			:key="`${rowIndex}-${keySet.join()}`"
-			:class="`game-keyboard__row game-keyboard__row--${rowIndex}`"
+			:class="$bem({ e: 'row', m: `${rowIndex}` })"
 		>
 			<KeyboardKey
 				v-for="(key, colIndex) in keySet"

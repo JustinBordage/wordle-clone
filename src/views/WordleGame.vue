@@ -1,78 +1,72 @@
 <script setup lang="ts">
-	import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
-	import { computedAsync } from "@vueuse/core";
-	import GameHeader from "@/components/GameHeader.vue";
+	import { computed, onBeforeMount, onUnmounted, ref } from "vue";
 	import GameBoard from "@/components/GameBoard.vue";
-	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
-	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
+	import GameHeader from "@/components/GameHeader.vue";
+	import GenerateWordleDialog from "@/components/generator/GenerateWordleDialog.vue";
 	import GameKeyboard from "@/components/keyboard/GameKeyboard.vue";
-	import { MAX_GUESSES } from "@/configuration/magic-numbers.ts";
-	import { validateWordle } from "@/composables/useWordleCheck";
-	import { generateWordle } from "@/helpers/wordle";
-	import GameTileState from "@/models/enums/GameTileState";
+	import GameMessageManager from "@/components/messages/GameMessageManager.vue";
+	import GameRulesDialog from "@/components/rules/GameRulesDialog.vue";
+	import GameSettingsDialog from "@/components/settings/GameSettingsDialog.vue";
+	import GameStatsDialog from "@/components/statistics/GameStatsDialog.vue";
+	import { useWordleStore } from "@/stores/wordle";
 
 	defineOptions({ name: "WordleGame" });
 
-	const results = ref<GameTileState[][]>(Array(MAX_GUESSES));
-	const guesses = ref<string[]>(Array(MAX_GUESSES).fill(""));
-	const activeRow = ref(0);
-
-	const showStatistics = ref(false);
+	// ----- Data -----
+	const isLoading = ref(true);
+	const currGuess = ref("");
 	const showGameRules = ref(false);
-	// This will be used to disable the inputs
-	// while the "flip" animation is running.
-	const disabled = ref(false);
+	const showStatistics = ref(false);
+	const showSettings = ref(false);
+	const showGenerator = ref(false);
+	/** Used to prevent inputs while the
+	 *  tile flip animation is running. */
+	const preventKeyInput = ref(false);
 
-	const solution = computedAsync(generateWordle, "");
-	const revealedGuesses = computed(() =>
-		guesses.value.slice(0, activeRow.value),
+	const wordleStore = useWordleStore();
+
+	// ----- Computed -----
+	const isAnyModalVisible = computed(
+		() =>
+			showGameRules.value ||
+			showGenerator.value ||
+			showStatistics.value ||
+			showSettings.value,
 	);
-	const isGameWon = computed(() =>
-		revealedGuesses.value.includes(solution.value),
-	);
-	const isGameLost = computed(
-		() => activeRow.value >= MAX_GUESSES && !isGameWon.value,
-	);
-	const isGameOver = computed(() => isGameLost.value || isGameWon.value);
 
-	const guess = computed({
-		get: () => guesses.value[activeRow.value],
-		set(newGuess: string) {
-			if (newGuess.length <= solution.value.length) {
-				guesses.value[activeRow.value] = newGuess;
-			}
-		},
-	});
-
-	const submitWord = () => {
-		if (solution.value.length !== guess.value.length) return;
-
-		// TODO: Perform other validation like
-		//  - Is it a valid word
-		const currRow = activeRow.value;
-		const currWord = guess.value;
-		if (currRow < MAX_GUESSES) {
-			disabled.value = true;
-			results.value[currRow] = validateWordle(solution.value, currWord);
-			activeRow.value++;
-		}
-	};
-
+	// ----- Methods -----
 	const VALID_KEYS = /[A-Za-z]/;
 
-	function pressKey(key: string) {
+	async function pressKey(key: string) {
+		if (
+			wordleStore.isGameOver ||
+			isAnyModalVisible.value ||
+			preventKeyInput.value
+		) {
+			return;
+		}
+
 		switch (key) {
 			case "Backspace":
-				guess.value = guess.value.slice(0, -1);
-				return;
+				currGuess.value = currGuess.value.slice(0, -1);
+				break;
 			case "Enter":
-				submitWord();
-				return;
+				const isSuccessful = await wordleStore.submitWord(
+					currGuess.value,
+				);
+				if (isSuccessful) {
+					preventKeyInput.value = true;
+					currGuess.value = "";
+				}
+				break;
 			default:
 				if (key.length === 1 && VALID_KEYS.test(key)) {
-					guess.value = guess.value + key.toUpperCase();
+					const newGuess = currGuess.value + key.toUpperCase();
+					if (newGuess.length <= wordleStore.solution.length) {
+						currGuess.value = newGuess;
+					}
 				}
-				return;
+				break;
 		}
 	}
 
@@ -81,11 +75,18 @@
 		if (!altKey && !ctrlKey) pressKey(key);
 	}
 
-	watch(isGameOver, gameIsOver => {
-		if (gameIsOver) showStatistics.value = true;
-	});
+	function onRevealEnd() {
+		preventKeyInput.value = false;
+		if (wordleStore.isGameOver) {
+			showStatistics.value = true;
+		}
+	}
 
-	onBeforeMount(() => {
+	// ----- Lifecycle Methods -----
+	onBeforeMount(async () => {
+		await wordleStore.initialize();
+		isLoading.value = false;
+
 		document.addEventListener("keydown", onBeforeInput);
 	});
 
@@ -95,27 +96,21 @@
 </script>
 
 <template>
-	<div v-if="solution !== ''" class="wordle-game nightmode">
+	<div v-if="!isLoading" :class="$bem({})">
 		<GameHeader
 			@openRules="showGameRules = true"
+			@openGenerator="showGenerator = true"
 			@openStats="showStatistics = true"
+			@openSettings="showSettings = true"
 		/>
-		<GameBoard
-			:solution="solution"
-			:activeRow="activeRow"
-			:guesses="guesses"
-		/>
-		<GameKeyboard
-			:results="results"
-			:revealedGuesses="revealedGuesses"
-			@pressKey="pressKey"
-		/>
+		<GameMessageManager />
+		<GameBoard :currGuess="currGuess" @revealComplete="onRevealEnd" />
+		<GameKeyboard @pressKey="pressKey" />
+		<!-- Game Dialogs/Modals -->
 		<GameRulesDialog v-model:isVisible="showGameRules" />
-		<GameStatsDialog
-			v-model:isVisible="showStatistics"
-			:solution="solution"
-			:isGameLost="isGameLost"
-		/>
+		<GameStatsDialog v-model:isVisible="showStatistics" />
+		<GameSettingsDialog v-model:isVisible="showSettings" />
+		<GenerateWordleDialog v-model:isVisible="showGenerator" />
 	</div>
 </template>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { computed } from "vue";
+	import { computed, nextTick, watch } from "vue";
 	import Dialog from "primevue/dialog";
 
 	defineOptions({ name: "Modal" });
@@ -8,10 +8,16 @@
 		(e: "update:isVisible", value: boolean);
 	}>();
 
-	const props = defineProps<{
-		title?: string;
-		isVisible: boolean;
-	}>();
+	const props = withDefaults(
+		defineProps<{
+			isVisible: boolean;
+			title?: string;
+			centered?: boolean;
+		}>(),
+		{
+			centered: false,
+		},
+	);
 
 	const visible = computed({
 		get() {
@@ -21,12 +27,35 @@
 			emit("update:isVisible", newVisible);
 		},
 	});
+
+	watch(
+		() => props.isVisible,
+		isVisible => {
+			if (isVisible) {
+				nextTick(() => {
+					const { activeElement } = document;
+					if (
+						activeElement?.matches("button.p-dialog-header-close")
+					) {
+						(activeElement as HTMLButtonElement).blur();
+					}
+				});
+			}
+		},
+	);
 </script>
 
 <template>
-	<Dialog class="modal" modal :draggable="false" v-model:visible="visible">
+	<Dialog
+		:class="$bem({})"
+		modal
+		:draggable="false"
+		v-model:visible="visible"
+	>
 		<template v-if="title" #header>
-			<h2 class="modal__title">{{ title }}</h2>
+			<h2 :class="$bem({ e: 'title', m: { centered } })">
+				{{ title }}
+			</h2>
 		</template>
 		<slot />
 	</Dialog>
@@ -45,6 +74,11 @@
 
 		&__title {
 			margin: 0;
+
+			&--centered {
+				width: 100%;
+				text-align: center;
+			}
 		}
 
 		& .p-dialog {
@@ -69,7 +103,7 @@
 			}
 
 			&-content {
-				padding-bottom: 0;
+				padding-bottom: 0.25rem;
 			}
 		}
 	}

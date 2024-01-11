@@ -1,10 +1,12 @@
+import router from "@/router";
 import { createApp } from "vue";
 import PrimeVue from "primevue/config";
 import Ripple from "primevue/ripple";
 import { createPinia } from "pinia";
 import App from "@/App.vue";
-import "@/styles/prime-vue/theme.scss";
+import "@/styles/prime-vue/inputswitch.scss";
 import "@/styles/common.scss";
+import { createBem } from "@/mixins/bem";
 import {
 	Chart as ChartJS,
 	Title,
@@ -27,6 +29,7 @@ ChartJS.register(
 );
 
 createApp(App)
+	.use(router)
 	.use(createPinia())
 	.use(PrimeVue, {
 		pt: {
@@ -39,4 +42,9 @@ createApp(App)
 		ripple: true,
 	})
 	.directive("ripple", Ripple)
+	.use(
+		createBem({
+			hyphenate: true,
+		}),
+	)
 	.mount("#app");
