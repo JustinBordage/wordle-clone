@@ -4,6 +4,8 @@
 	import Modal from "@/components/common/Modal.vue";
 	import GameStat from "@/components/statistics/GameStat.vue";
 	import GuessDistribution from "@/components/statistics/GuessDistribution.vue";
+	import { useGameMode } from "@/composables/useGameMode";
+	import { GameMode } from "@/models/enums/GameMode";
 	import GameStatus from "@/models/enums/GameStatus";
 	import { useStatisticsStore } from "@/stores/statistics";
 	import { useWordleStore } from "@/stores/wordle";
@@ -20,6 +22,7 @@
 
 	const statisticsStore = useStatisticsStore();
 	const wordleStore = useWordleStore();
+	const gameMode = useGameMode();
 
 	const visible = computed({
 		get(): boolean {
@@ -36,6 +39,12 @@
 		if (gamesPlayed === 0) return 1;
 
 		return (gamesPlayed - gamesLost) / gamesPlayed;
+	});
+
+	const playAgainText = computed(() => {
+		return gameMode.value === GameMode.WORDLE_UNLIMITED
+			? "Play Again"
+			: "Play Wordle Unlimited";
 	});
 
 	function playAgain() {
@@ -80,16 +89,13 @@
 				:hasPlayedGame="statistics.gamesPlayed > 0"
 				:distribution="statistics.guessDistribution"
 			/>
-			<div
-				v-if="wordleStore.isGameOver"
-				:class="$bem({ e: 'game-options' })"
-			>
+			<div :class="$bem({ e: 'game-options' })">
 				<Button
 					:class="$bem({ e: 'button' })"
-					aria-label="Play Again"
+					:aria-label="playAgainText"
 					@click="playAgain"
 				>
-					Play again
+					{{ playAgainText }}
 				</Button>
 			</div>
 		</div>
@@ -99,7 +105,7 @@
 <style lang="scss">
 	.game-stats-dialog {
 		& h4 {
-			letter-spacing: 0.5px;
+			letter-spacing: 0.0625rem;
 			text-transform: uppercase;
 			margin: 0.375rem 0;
 			text-align: center;
@@ -144,6 +150,7 @@
 			display: flex;
 			flex-direction: row;
 			justify-content: center;
+			align-items: center;
 		}
 
 		&__button {
@@ -152,6 +159,9 @@
 			color: var(--key-evaluated-text-color);
 			border: none;
 			outline: none;
+			font-weight: bold;
+			text-transform: uppercase;
+			height: 3.25rem;
 		}
 	}
 </style>
