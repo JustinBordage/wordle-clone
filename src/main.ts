@@ -29,8 +29,8 @@ ChartJS.register(
 );
 
 createApp(App)
-	.use(createPinia())
 	.use(router)
+	.use(createPinia())
 	.use(PrimeVue, {
 		pt: {
 			chip: {
