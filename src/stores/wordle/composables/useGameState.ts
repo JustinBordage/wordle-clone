@@ -88,7 +88,7 @@ export default function useGameState() {
 					);
 				}
 			} catch (e) {
-				await resetProgress(GameMode.WORDLE_DAILY);
+				await resetProgress(GameMode.WORDLE_UNLIMITED);
 			}
 		}
 	}

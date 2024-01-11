@@ -9,6 +9,8 @@ export function useGameMode(): ComputedRef<GameMode> {
 		switch (route.name) {
 			case GameMode.WORDLE_CHALLENGE:
 				return GameMode.WORDLE_CHALLENGE;
+			case GameMode.WORDLE_UNLIMITED:
+				return GameMode.WORDLE_UNLIMITED;
 			case GameMode.WORDLE_DAILY:
 			default:
 				return GameMode.WORDLE_DAILY;

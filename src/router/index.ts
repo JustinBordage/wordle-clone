@@ -15,6 +15,11 @@ const routes: Array<RouteRecordRaw> = [
 		component: WordleGame,
 	},
 	{
+		path: "/unlimited",
+		name: GameMode.WORDLE_UNLIMITED,
+		component: WordleGame,
+	},
+	{
 		path: "/challenge/:solution",
 		name: GameMode.WORDLE_CHALLENGE,
 		component: WordleGame,

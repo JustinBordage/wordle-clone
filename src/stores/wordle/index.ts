@@ -102,7 +102,7 @@ export const useWordleStore = defineStore("wordle", () => {
 	}, 250);
 
 	async function resetGame() {
-		await resetProgress(GameMode.WORDLE_DAILY);
+		await resetProgress(GameMode.WORDLE_UNLIMITED);
 		messageStore.showGameStartMessage();
 		privateState.gameStatus = GameStatus.NOT_STARTED;
 		winningRowIndex.value = null;
