@@ -3,11 +3,9 @@ import { defineStore } from "pinia";
 import { useThrottleFn } from "@vueuse/core";
 import useGameState from "./composables/useGameState";
 import useHardMode from "./composables/useHardMode";
-import { useGameMode } from "@/composables/useGameMode";
 import { useSpellchecker } from "@/composables/useSpellchecker";
 import { MAX_GUESSES } from "@/configuration/constants";
 import { evalGameStatus, hasGameEnded } from "./helpers/game-status";
-import { generateWordle } from "@/helpers/wordle";
 import { validateRow } from "./helpers/validation";
 import { GameMessageType } from "@/models/enums/GameMessageType";
 import { GameMode } from "@/models/enums/GameMode";
@@ -15,27 +13,19 @@ import GameStatus from "@/models/enums/GameStatus";
 import { useMessageStore } from "@/stores/message";
 import { useStatisticsStore } from "@/stores/statistics";
 
-const usePrivateWordleStore = defineStore("privateWordle", {
-	state: () => ({
-		gameStatus: GameStatus.NOT_STARTED,
-	}),
-});
-
 export const useWordleStore = defineStore("wordle", () => {
 	const messageStore = useMessageStore();
 	const statisticsStore = useStatisticsStore();
 	const { gameState, resetProgress, persistGuess, initializeState } =
 		useGameState();
 	const { isMisspelled } = useSpellchecker();
-	const gameMode = useGameMode();
 
 	// ----- State -----
-	const privateState = usePrivateWordleStore();
+	const gameStatus = ref(GameStatus.NOT_STARTED);
 	const winningRowIndex = ref<number | null>(null);
 	const restoredRows = ref(0);
 
 	// ----- Getters -----
-	const gameStatus = computed(() => privateState.gameStatus);
 	const solution = computed(() => gameState.value.solution);
 	const guesses = computed(() => gameState.value.guesses);
 	const results = computed(() => gameState.value.results);
@@ -93,7 +83,7 @@ export const useWordleStore = defineStore("wordle", () => {
 				winningRowIndex.value = currRow;
 			}
 		}
-		privateState.gameStatus = newGameStatus;
+		gameStatus.value = newGameStatus;
 
 		// --- Side Effects ---
 		messageStore.clearGameStartMessage();
@@ -104,7 +94,7 @@ export const useWordleStore = defineStore("wordle", () => {
 	async function resetGame() {
 		await resetProgress(GameMode.WORDLE_UNLIMITED);
 		messageStore.showGameStartMessage();
-		privateState.gameStatus = GameStatus.NOT_STARTED;
+		gameStatus.value = GameStatus.NOT_STARTED;
 		winningRowIndex.value = null;
 		restoredRows.value = 0;
 	}
@@ -112,24 +102,17 @@ export const useWordleStore = defineStore("wordle", () => {
 	async function initialize() {
 		await initializeState();
 
-		if (gameMode.value === GameMode.WORDLE_DAILY) {
-			const wordle = await generateWordle(GameMode.WORDLE_DAILY);
-			if (wordle !== solution.value) {
-				await resetProgress(GameMode.WORDLE_DAILY, wordle);
-			}
-		}
-
-		const gameStatus = evalGameStatus(
+		const newGameStatus = evalGameStatus(
 			solution.value,
 			guesses.value,
 			activeRowIndex.value,
 		);
-		privateState.gameStatus = gameStatus;
+		gameStatus.value = newGameStatus;
 
-		const numOfGuesses = gameState.value.guesses.length;
+		const numOfGuesses = guesses.value.length;
 		restoredRows.value = numOfGuesses;
 
-		if (gameStatus === GameStatus.WIN) {
+		if (newGameStatus === GameStatus.WIN) {
 			winningRowIndex.value = numOfGuesses - 1;
 		}
 
