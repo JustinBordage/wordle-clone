@@ -24,7 +24,7 @@
 				:letter="letter"
 				:doBounce="false"
 				:isRestoredRow="false"
-				:tileIndex="index"
+				:tileIndex="0"
 				:state="index === revealIndex ? state : GameTileState.TBD"
 			/>
 		</div>
