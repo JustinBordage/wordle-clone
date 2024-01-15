@@ -21,6 +21,7 @@ export const useWordleStore = defineStore("wordle", () => {
 		useGameState();
 	const { isMisspelled } = useSpellchecker();
 	const guessRestrictions = useGuessRestrictions(gameState);
+	const isHardModeEnabled = useHardMode();
 
 	// ----- State -----
 	const gameStatus = ref(GameStatus.NOT_STARTED);
@@ -34,7 +35,6 @@ export const useWordleStore = defineStore("wordle", () => {
 	const activeRowIndex = computed(() => guesses.value.length);
 	const hasGameStarted = computed(() => activeRowIndex.value > 0);
 	const isGameOver = computed(() => hasGameEnded(gameStatus.value));
-	const isHardModeEnabled = useHardMode(hasGameStarted);
 
 	// ----- Methods -----
 	function validateGuess(guess: string): boolean {
