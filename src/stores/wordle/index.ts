@@ -2,11 +2,12 @@ import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import { useThrottleFn } from "@vueuse/core";
 import useGameState from "./composables/useGameState";
+import { useGuessRestrictions } from "./composables/useGuessRestrictions";
 import useHardMode from "./composables/useHardMode";
 import { useSpellchecker } from "@/composables/useSpellchecker";
 import { MAX_GUESSES } from "@/configuration/constants";
 import { evalGameStatus, hasGameEnded } from "./helpers/game-status";
-import { validateRow } from "./helpers/validation";
+import { validateGuessRestrictions, validateRow } from "./helpers/validation";
 import { GameMessageType } from "@/models/enums/GameMessageType";
 import { GameMode } from "@/models/enums/GameMode";
 import GameStatus from "@/models/enums/GameStatus";
@@ -19,6 +20,8 @@ export const useWordleStore = defineStore("wordle", () => {
 	const { gameState, resetProgress, persistGuess, initializeState } =
 		useGameState();
 	const { isMisspelled } = useSpellchecker();
+	const guessRestrictions = useGuessRestrictions(gameState);
+	const isHardModeEnabled = useHardMode();
 
 	// ----- State -----
 	const gameStatus = ref(GameStatus.NOT_STARTED);
@@ -32,7 +35,6 @@ export const useWordleStore = defineStore("wordle", () => {
 	const activeRowIndex = computed(() => guesses.value.length);
 	const hasGameStarted = computed(() => activeRowIndex.value > 0);
 	const isGameOver = computed(() => hasGameEnded(gameStatus.value));
-	const isHardModeEnabled = useHardMode(hasGameStarted);
 
 	// ----- Methods -----
 	function validateGuess(guess: string): boolean {
@@ -56,6 +58,17 @@ export const useWordleStore = defineStore("wordle", () => {
 				"This word has already been used!",
 			);
 			return false;
+		}
+
+		if (isHardModeEnabled.value) {
+			const errorMsg = validateGuessRestrictions(
+				guessRestrictions.value,
+				guess,
+			);
+			if (errorMsg !== null) {
+				messageStore.setMessage(GameMessageType.WARNING, errorMsg);
+				return false;
+			}
 		}
 
 		return true;
@@ -85,7 +98,6 @@ export const useWordleStore = defineStore("wordle", () => {
 		}
 		gameStatus.value = newGameStatus;
 
-		// --- Side Effects ---
 		messageStore.clearGameStartMessage();
 
 		return true;

@@ -33,10 +33,37 @@ export function isNotBlank(
 	return !isBlank(strVal);
 }
 
+/** Converts a number to a string and then calls `padStart`. */
 export function padNumberStart(
 	num: number,
 	maxLength: number,
 	fillString: string = "0",
 ) {
 	return num.toString().padStart(maxLength, fillString);
+}
+
+/** Evaluates the ordinal suffix of a number. */
+export function ordinalOf(num: number): string {
+	// Ordinal for teens (11 to 19)
+	if ((num / 10) % 10 == 1) {
+		return "th";
+	}
+
+	// Suffix for 'Ones'
+	switch (num % 10) {
+		case 1:
+			return "st";
+		case 2:
+			return "nd";
+		case 3:
+			return "rd";
+		default:
+			return "th";
+	}
+}
+
+/** Evaluates the ordinal suffix of a number
+ *  and then appends it behind the number. */
+export function appendOrdinal(num: number): string {
+	return `${num}${ordinalOf(num)}`;
 }

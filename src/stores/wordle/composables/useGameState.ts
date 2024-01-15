@@ -122,7 +122,7 @@ export default function useGameState() {
 	};
 }
 
-type GameState = {
+export type GameState = {
 	guesses: string[];
 	results: RevealedState[][];
 	/** The generated solution word, so it

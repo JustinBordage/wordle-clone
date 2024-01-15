@@ -1,4 +1,6 @@
 import GameTileState, { RevealedState } from "@/models/enums/GameTileState";
+import { GuessRestriction } from "@/stores/wordle/composables/useGuessRestrictions";
+import { appendOrdinal } from "@/utils/string";
 
 export function validateRow(wordle: string, guess: string): RevealedState[] {
 	const solution = Array.from(wordle.toUpperCase());
@@ -31,4 +33,45 @@ export function validateRow(wordle: string, guess: string): RevealedState[] {
 	});
 
 	return result;
+}
+
+export function validateGuessRestrictions(
+	restrictions: GuessRestriction[],
+	currGuess: string,
+) {
+	const guessWord = Array.from(currGuess.toUpperCase());
+
+	const correctLetterError = restrictions
+		.filter(({ state }) => state === GameTileState.CORRECT)
+		.find(({ letter, index }) => {
+			if (currGuess.charAt(index) === letter) {
+				guessWord[index] = "";
+				return false;
+			} else {
+				return true;
+			}
+		});
+
+	if (correctLetterError) {
+		const { index, letter } = correctLetterError;
+		return `${appendOrdinal(index + 1)} letter must be '${letter}'`;
+	}
+
+	const presentLetterError = restrictions
+		.filter(({ state }) => state === GameTileState.PRESENT)
+		.find(({ letter }) => {
+			const letterIndex = guessWord.indexOf(letter);
+			if (letterIndex !== -1) {
+				guessWord[letterIndex] = "";
+				return false;
+			} else {
+				return true;
+			}
+		});
+
+	if (presentLetterError) {
+		return `Guess must contain '${presentLetterError.letter}'`;
+	}
+
+	return null;
 }
