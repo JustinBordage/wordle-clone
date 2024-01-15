@@ -25,3 +25,4 @@ dist-ssr
 
 # Custom Ignores
 _deprecated
+public/api/words/old/*

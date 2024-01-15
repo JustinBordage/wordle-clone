@@ -77,6 +77,11 @@ export default function useGameState() {
 				savedGameMode !== currGameMode
 			) {
 				await resetProgress(currGameMode);
+			} else if (currGameMode === GameMode.WORDLE_DAILY) {
+				const wordle = await generateWordle(GameMode.WORDLE_DAILY);
+				if (wordle !== solution) {
+					await resetProgress(GameMode.WORDLE_DAILY, wordle);
+				}
 			}
 		} else {
 			try {
@@ -117,7 +122,7 @@ export default function useGameState() {
 	};
 }
 
-type GameState = {
+export type GameState = {
 	guesses: string[];
 	results: RevealedState[][];
 	/** The generated solution word, so it

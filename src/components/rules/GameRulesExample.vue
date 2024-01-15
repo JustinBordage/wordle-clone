@@ -22,6 +22,9 @@
 				:key="`${letter}-${index}`"
 				:class="$bem({ e: 'tile' })"
 				:letter="letter"
+				:doBounce="false"
+				:isRestoredRow="false"
+				:tileIndex="index"
 				:state="index === revealIndex ? state : GameTileState.TBD"
 			/>
 		</div>

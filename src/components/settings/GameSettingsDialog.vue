@@ -28,6 +28,10 @@
 			emit("update:isVisible", newVisible);
 		},
 	});
+
+	const preventHardModeToggle = computed(
+		() => !wordleStore.isHardModeEnabled && wordleStore.hasGameStarted,
+	);
 </script>
 
 <template>
@@ -40,6 +44,7 @@
 		<GameSettingToggle
 			title="Hard Mode"
 			description="Any revealed hints must be used in subsequent guesses"
+			:disabled="preventHardModeToggle"
 			v-model="wordleStore.isHardModeEnabled"
 		/>
 		<GameSettingToggle title="Dark Theme" v-model="isDarkThemeEnabled" />
