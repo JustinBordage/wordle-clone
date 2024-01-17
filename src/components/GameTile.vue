@@ -7,15 +7,21 @@
 
 	defineOptions({ name: "GameTile" });
 
-	const props = defineProps<{
-		state: GameTileState;
-		letter: string;
-		tileIndex: number;
-		/** If the current row's state was
-		 *  restored from local storage */
-		isRestoredRow: boolean;
-		doBounce: boolean;
-	}>();
+	const props = withDefaults(
+		defineProps<{
+			state: GameTileState;
+			letter: string;
+			tileIndex: number;
+			/** If the current row's state was
+			 *  restored from local storage */
+			isRestoredRow: boolean;
+			doBounce: boolean;
+		}>(),
+		{
+			doBounce: false,
+			isRestoredRow: false,
+		},
+	);
 
 	// ----- Data -----
 	const tileRef = ref<HTMLDivElement>();
