@@ -16,7 +16,7 @@
 <template>
 	<div :class="$bem({})">
 		<var :class="$bem({ e: 'value' })">
-			{{ value }}
+			{{ Math.floor(value) }}
 		</var>
 		<label :class="$bem({ e: 'label', m: { wrap: wrapLabel } })">
 			{{ label }}
