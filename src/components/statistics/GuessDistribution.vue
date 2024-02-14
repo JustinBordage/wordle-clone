@@ -104,11 +104,16 @@
 
 <style lang="scss">
 	.guess-distribution {
-		padding-bottom: 0.75rem;
+		margin-bottom: 0.75rem;
 
 		&__title {
 			text-align: center;
 			margin: 0.375rem 0;
+		}
+
+		&__chart {
+			width: 400px;
+			max-height: 200px;
 		}
 
 		&__no-data {

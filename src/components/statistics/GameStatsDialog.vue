@@ -112,6 +112,8 @@
 
 <style lang="scss">
 	.game-stats-dialog {
+		min-width: 500px;
+
 		& h4 {
 			letter-spacing: 0.0625rem;
 			text-transform: uppercase;
@@ -151,7 +153,7 @@
 			flex-flow: row nowrap;
 			justify-content: center;
 			padding-bottom: 0.375rem;
-			gap: 0.5rem;
+			gap: 1rem;
 		}
 
 		&__game-options {
