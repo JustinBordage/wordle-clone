@@ -21,9 +21,12 @@
 	const wordleStore = useWordleStore();
 
 	const letterStates = computed(() => {
-		return wordleStore.results.reduce<Record<string, RevealedState>>(
-			(acc, resultRow, index) => {
-				const guessWord = wordleStore.guesses[index] ?? "";
+		const { keyboardRowNum, results, guesses } = wordleStore;
+
+		return results
+			.slice(0, keyboardRowNum)
+			.reduce<Record<string, RevealedState>>((acc, resultRow, index) => {
+				const guessWord = guesses[index] ?? "";
 
 				resultRow.forEach((newLetterState, index) => {
 					const letter = guessWord.charAt(index);
@@ -33,9 +36,7 @@
 				});
 
 				return acc;
-			},
-			{},
-		);
+			}, {});
 	});
 </script>
 

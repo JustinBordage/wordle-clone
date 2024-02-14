@@ -7,7 +7,7 @@
 
 	defineOptions({ name: "GameBoard" });
 
-	defineEmits<{
+	const emit = defineEmits<{
 		(e: "revealComplete");
 	}>();
 
@@ -30,6 +30,11 @@
 		}
 	}
 
+	function onRevealComplete() {
+		wordleStore.keyboardRowNum = wordleStore.activeRowIndex;
+		emit("revealComplete");
+	}
+
 	// ----- Composables -----
 	const rowIds = useIdSetGenerator(() => MAX_GUESSES);
 </script>
@@ -41,7 +46,7 @@
 			:key="id"
 			:guess="getRowGuess(index)"
 			:rowIndex="index"
-			@revealComplete="$emit('revealComplete')"
+			@revealComplete="onRevealComplete"
 		/>
 	</div>
 </template>

@@ -27,6 +27,11 @@ export const useWordleStore = defineStore("wordle", () => {
 	const gameStatus = ref(GameStatus.NOT_STARTED);
 	const winningRowIndex = ref<number | null>(null);
 	const restoredRows = ref(0);
+	/** The row which the keyboard can "see"
+	 *  for revealing the keyboard key states.
+	 *
+	 *  @remark This is an exclusive value. */
+	const keyboardRowNum = ref(0);
 
 	// ----- Getters -----
 	const solution = computed(() => gameState.value.solution);
@@ -109,6 +114,7 @@ export const useWordleStore = defineStore("wordle", () => {
 		gameStatus.value = GameStatus.NOT_STARTED;
 		winningRowIndex.value = null;
 		restoredRows.value = 0;
+		keyboardRowNum.value = 0;
 	}
 
 	async function initialize() {
@@ -140,6 +146,7 @@ export const useWordleStore = defineStore("wordle", () => {
 		results,
 		activeRowIndex,
 		winningRowIndex,
+		keyboardRowNum,
 		hasGameStarted,
 		isGameOver,
 		isHardModeEnabled,
