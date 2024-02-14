@@ -40,7 +40,7 @@
 	const showWinBounce = computed(() => {
 		const isWinningRow = wordleStore.winningRowIndex === props.rowIndex;
 		return (
-			!isRestoredRow &&
+			!isRestoredRow.value &&
 			isWinningRow &&
 			wordleStore.winningRowIndex !== null
 		);
