@@ -4,10 +4,10 @@
 	import TextInput from "primevue/inputtext";
 	import Button from "primevue/button";
 	import Modal from "@/components/common/Modal.vue";
+	import useCopyToClipboard from "@/composables/useCopyToClipboard";
 	import { useSpellchecker } from "@/composables/useSpellchecker";
 	import { obfuscateSolution } from "@/helpers/wordle-obfuscation";
 	import { GameMode } from "@/models/enums/GameMode";
-	import { copyToClipboard } from "@/utils/clipboard";
 
 	defineOptions({ name: "GenerateWordleDialog" });
 
@@ -20,6 +20,7 @@
 	}>();
 
 	const router = useRouter();
+	const copyToClipboard = useCopyToClipboard();
 	const { isMisspelled } = useSpellchecker();
 
 	const customGuess = ref("");
@@ -55,7 +56,7 @@
 		}, 5000);
 	}
 
-	function copyWordleLink() {
+	async function copyWordleLink() {
 		if (customGuess.value.length < 4 || isMisspelled(customGuess.value)) {
 			setUserMessage("Not a valid word!", true);
 			return;
@@ -71,8 +72,8 @@
 			},
 		});
 
-		copyToClipboard(`${origin}${route.fullPath}`);
-		setUserMessage("Link Copied!", false);
+		const isCopied = await copyToClipboard(`${origin}${route.fullPath}`);
+		if (isCopied) setUserMessage("Link Copied!", false);
 	}
 </script>
 
